@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import dynamic from "next/dynamic";
+import styles from "./styles/login-form.module.css";
 
 const loginSchema = z.object({
   email: z
@@ -54,7 +55,7 @@ function LoginFormComponent() {
 
   return (
     <div className="w-full">
-      <div className="w-full max-w-lg mx-auto bg-white rounded-3xl shadow-2xl p-6 sm:p-8 relative">
+      <div className={`${styles.card} w-full`}>
 
         {/* Loading Overlay con Banana girando */}
         {isLoading && (
@@ -71,7 +72,7 @@ function LoginFormComponent() {
         )}
 
         {/* Logo */}
-        <div className="flex justify-center mb-4">
+        <div className={styles.logoWrap}>
           <div className="w-16 h-16 sm:w-20 sm:h-20 bg-yellow-400 rounded-full flex items-center justify-center shadow-lg">
             <svg className="w-10 h-10 sm:w-12 sm:h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
               <path d="M12 2L2 7l10 5 10-5-10-5z" fill="#1f2937" />
@@ -81,42 +82,39 @@ function LoginFormComponent() {
         </div>
 
         {/* Header */}
-        <h1 className="text-2xl sm:text-3xl font-bold text-center text-gray-900 mb-1">
+        <h1 className={`${styles.title} text-2xl sm:text-3xl mb-1`}>
           Bienvenido
         </h1>
-        <p className="text-center text-gray-600 text-sm mb-6">
+        <p className={styles.subtitle}>
           Inicia sesión para continuar
         </p>
 
         {/* Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+  <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
 
           {/* Email Field */}
           <div>
-            <label htmlFor="email" className="block text-sm font-semibold text-gray-800 mb-2">
+            <label htmlFor="email" className={styles.fieldLabel}>
               Correo Electrónico
             </label>
-            <div className="relative">
+            <div className={styles.inputWrap}>
               <Mail className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
               <input
                 id="email"
                 type="email"
                 {...register("email")}
                 placeholder="tu@email.com"
-                className={`w-full pl-11 pr-4 py-2.5 sm:py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all bg-gray-50 text-sm sm:text-base ${errors.email
-                  ? 'border-red-500 focus:ring-red-500'
-                  : 'border-gray-200 focus:ring-yellow-400 focus:border-yellow-400'
-                  }`}
+                className={`${styles.input} ${errors.email ? styles.inputError : ''}`}
               />
             </div>
             {errors.email && (
-              <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+              <p className={styles.errorText}>{errors.email.message}</p>
             )}
           </div>
 
           {/* Password Field */}
           <div>
-            <label htmlFor="password" className="block text-sm font-semibold text-gray-800 mb-2">
+            <label htmlFor="password" className={styles.fieldLabel}>
               Contraseña
             </label>
             <div className="relative">
@@ -126,10 +124,7 @@ function LoginFormComponent() {
                 type={showPassword ? 'text' : 'password'}
                 {...register("password")}
                 placeholder="········"
-                className={`w-full pl-11 pr-12 py-2.5 sm:py-3 border rounded-xl focus:outline-none focus:ring-2 transition-all bg-gray-50 text-sm sm:text-base ${errors.password
-                  ? 'border-red-500 focus:ring-red-500'
-                  : 'border-gray-200 focus:ring-yellow-400 focus:border-yellow-400'
-                  }`}
+                className={`${styles.input} pr-12 ${errors.password ? styles.inputError : ''}`}
               />
               <button
                 type="button"
@@ -141,7 +136,7 @@ function LoginFormComponent() {
               </button>
             </div>
             {errors.password && (
-              <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+              <p className={styles.errorText}>{errors.password.message}</p>
             )}
           </div>
 
@@ -149,26 +144,24 @@ function LoginFormComponent() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-yellow-500 hover:bg-yellow-600 text-gray-900 font-bold py-2.5 sm:py-3.5 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg text-sm sm:text-base"
+            className={`${styles.submitBtn} ${isLoading ? 'disabled:opacity-50 disabled:cursor-not-allowed' : ''}`}
           >
             Iniciar Sesión
           </button>
         </form>
 
         {/* Divider */}
-        <div className="my-5 flex items-center">
-          <div className="flex-1 border-t border-gray-300"></div>
-          <span className="px-4 text-xs sm:text-sm text-gray-500 font-medium">O continúa con</span>
-          <div className="flex-1 border-t border-gray-300"></div>
+        <div className={styles.divider}>
+          <span>O continúa con</span>
         </div>
 
         {/* OAuth Buttons */}
-        <div className="space-y-2.5">
+        <div className={styles.oauthList}>
           <button
             type="button"
             onClick={() => handleOAuthLogin('google')}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base font-medium text-gray-700"
+            className={`${styles.oauthBtn} w-full text-sm sm:text-base font-medium text-gray-700`}
           >
             <svg width="20" height="20" viewBox="0 0 18 18">
               <path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z" />
@@ -184,7 +177,7 @@ function LoginFormComponent() {
             type="button"
             onClick={() => handleOAuthLogin('microsoft')}
             disabled={isLoading}
-            className="w-full flex items-center justify-center gap-3 px-4 py-3.5 border-2 border-gray-200 rounded-xl hover:bg-gray-50 transition-all disabled:opacity-50 disabled:cursor-not-allowed font-medium text-gray-700"
+            className={`${styles.oauthBtn} w-full font-medium text-gray-700`}
           >
             <svg width="20" height="20" viewBox="0 0 21 21">
               <rect x="1" y="1" width="9" height="9" fill="#f25022" />
@@ -198,8 +191,8 @@ function LoginFormComponent() {
         </div>
 
         {/* Link de contraseña olvidada */}
-        <div className="mt-5 text-center">
-          <a href="#" className="text-sm text-gray-600 hover:text-gray-800 transition-colors">
+        <div className={styles.forgotWrap}>
+          <a href="#" className={styles.forgotLink}>
             ¿Olvidaste tu contraseña?
           </a>
         </div>
