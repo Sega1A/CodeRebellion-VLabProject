@@ -58,5 +58,9 @@ export const authOptions: AuthOptions = {
       if (token) (session.user as any).id = token.id;
       return session;
     },
+    async redirect({ url, baseUrl }) {
+      // Temporal redirection.
+      return "/home";
+    },
   },
 };
