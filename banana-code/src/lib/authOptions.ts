@@ -55,7 +55,9 @@ export const authOptions: AuthOptions = {
       return token;
     },
     async session({ session, token }) {
-      if (token) (session.user as any).id = token.id;
+      if (token && session.user) {
+        (session.user as { id?: string }).id = token.id as string;
+      }
       return session;
     },
     async redirect({ url, baseUrl }) {
