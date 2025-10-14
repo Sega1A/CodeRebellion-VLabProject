@@ -1,4 +1,4 @@
-import { AuthService } from "@/services/user.service";
+import { AuthService } from "@/services/auth.service";
 
 export async function registerController(req: Request) {
   const { email, password, name } = await req.json();
