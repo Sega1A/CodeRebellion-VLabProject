@@ -51,18 +51,41 @@ export const authOptions: AuthOptions = {
   // pages: { signIn: "/login" },
   callbacks: {
     async jwt({ token, user }) {
-      if (user) token.id = user.id;
+      if (user) {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { id: true, role: true, name: true },
+        });
+
+        token.id = dbUser?.id;
+        token.role = dbUser?.role;
+        token.name = dbUser?.name;
+      }
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
-        (session.user as { id?: string }).id = token.id as string;
+        session.user.id = token.id as string;
+        session.user.role = token.role as string;
+        session.user.name = token.name as string;
       }
       return session;
     },
     async redirect({ url, baseUrl }) {
-      // Temporal redirection.
-      return "/home";
+      if (url.startsWith("/")) return `${baseUrl}${url}`;
+      return baseUrl;
+    },
+    async signIn({ user }) {
+      if (!user) return false;
+      const dbUser = await prisma.user.findUnique({
+        where: { id: user.id },
+        select: { role: true },
+      });
+
+      if (dbUser?.role === "ADMINISTRADOR") return "/admin";
+      if (dbUser?.role === "PROFESOR_EJECUTOR") return "/profesor/editor";
+      if (dbUser?.role === "PROFESOR_EDITOR") return "/profesor/ejecutor";
+      return "/estudiante";
     },
   },
 };
