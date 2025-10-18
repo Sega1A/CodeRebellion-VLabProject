@@ -63,3 +63,28 @@ model VerificationToken {
 
   @@unique([identifier, token])
 }
+
+model Course {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  code        String   @unique
+  startDate   DateTime?
+  endDate     DateTime?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  students    Student[]
+}
+
+model Student {
+  id          String   @id @default(cuid())
+  firstName   String
+  lastName    String
+  email       String   @unique
+  studentCode String   @unique
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  enrolledAt  DateTime @default(now())
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
