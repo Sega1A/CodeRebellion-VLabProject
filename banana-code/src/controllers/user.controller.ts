@@ -6,11 +6,10 @@ export const UserController = {
     try {
       const users = await UserService.listUsers();
       return NextResponse.json(users);
-    } catch (error: any) {
-      return NextResponse.json(
-        { error: error.message || "Error al obtener usuarios" },
-        { status: 500 }
-      );
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Error al obtener usuarios";
+      return NextResponse.json({ error: message }, { status: 500 });
     }
   },
 
@@ -24,11 +23,10 @@ export const UserController = {
 
       const updatedUser = await UserService.changeUserRole(id, role);
       return NextResponse.json(updatedUser);
-    } catch (error: any) {
-      return NextResponse.json(
-        { error: error.message || "Error al cambiar rol" },
-        { status: 500 }
-      );
+    } catch (error: unknown) {
+      const message =
+        error instanceof Error ? error.message : "Error al cambiar rol";
+      return NextResponse.json({ error: message }, { status: 500 });
     }
   },
 };
