@@ -14,10 +14,18 @@ model User {
   password       String?
   emailVerified  DateTime?
   image          String?
+  role           Role     @default(ESTUDIANTE)
   accounts       Account[]
   sessions       Session[]
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
+}
+
+enum Role {
+  ADMINISTRADOR
+  ESTUDIANTE
+  PROFESOR_EJECUTOR
+  PROFESOR_EDITOR
 }
 
 model Account {

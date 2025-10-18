@@ -1,18 +1,26 @@
 import { UserRepository } from "@/repositories/user.repository";
-import bcrypt from "bcrypt";
+import { User } from "@prisma/client";
 
-export const AuthService = {
-  async register(email: string, password: string, name?: string) {
-    const existingUser = await UserRepository.findByEmail(email);
-    if (!existingUser) {
-      throw new Error("El usuario ya existe");
+export const UserService = {
+  async listUsers() {
+    return await UserRepository.getUsers();
+  },
+
+  async changeUserRole(id: string, role: User["role"]) {
+    const user = await UserRepository.findById(id);
+
+    if (role === "ADMINISTRADOR") {
+      throw new Error("No se puede asignar el rol de administrador");
     }
-    const hash = await bcrypt.hash(password, 10);
-    return UserRepository.create({
-      email,
-      password: hash,
-      name,
-      provider: "credentials",
-    } as any);
+
+    if (!user) {
+      throw new Error("Usuario no encontrado");
+    }
+
+    if (user.role === "ADMINISTRADOR") {
+      throw new Error("No se puede cambiar el rol de un administrador");
+    }
+
+    return await UserRepository.changeRole(id, role);
   },
 };
