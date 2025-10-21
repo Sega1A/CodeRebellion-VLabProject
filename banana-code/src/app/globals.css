@@ -1,0 +1,16 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --bg-card: #ffffff;
+  --primary: #f59e0b; /* yellow-500 */
+  --primary-dark: #d97706; /* yellow-600 */
+  --muted: #6b7280; /* gray-500 */
+  --danger: #dc2626; /* red-600 */
+}
