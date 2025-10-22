@@ -12,7 +12,8 @@ const defaultCourse = {
 };
 
 export default function HomePage() {
-  const [role] = useState<Role>("estudiante");
+  const initialRole = (globalThis as any).__TEST_ROLE__ ?? ("estudiante" as Role);
+  const [role] = useState<Role>(initialRole);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [course, setCourse] = useState(defaultCourse);
   const [editing, setEditing] = useState(false);
