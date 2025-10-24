@@ -4,6 +4,10 @@ import { render, screen, fireEvent } from "@testing-library/react";
 import "@testing-library/jest-dom";
 import HomePage from "@/app/vista_curso/page";
 
+// Type for globalThis with test role
+interface GlobalThisWithTestRole {
+  __TEST_ROLE__?: string;
+}
 
 global.alert = jest.fn();
 global.console.log = jest.fn();
@@ -39,7 +43,7 @@ describe("HomePage - Vista Curso (app/vista_curso/page.tsx)", () => {
   });
 
   test("flujo de edición: mostrar Editar, editar y guardar (mock role)", () => {
-    (globalThis as any).__TEST_ROLE__ = "profesorEditor";
+    (globalThis as GlobalThisWithTestRole).__TEST_ROLE__ = "profesorEditor";
     try {
       render(<HomePage />);
 
@@ -66,7 +70,7 @@ describe("HomePage - Vista Curso (app/vista_curso/page.tsx)", () => {
       expect(screen.getByText("Nuevo Título")).toBeInTheDocument();
       expect(window.alert).toHaveBeenCalled();
     } finally {
-      delete (globalThis as any).__TEST_ROLE__;
+      delete (globalThis as GlobalThisWithTestRole).__TEST_ROLE__;
     }
   });
 
