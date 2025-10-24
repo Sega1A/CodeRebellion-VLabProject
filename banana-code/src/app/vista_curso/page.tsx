@@ -5,6 +5,11 @@ import "./styles.css";
 
 type Role = "estudiante" | "profesorEditor" | "admin";
 
+// Type for globalThis with test role
+interface GlobalThisWithTestRole {
+  __TEST_ROLE__?: Role;
+}
+
 const defaultCourse = {
   title: "Introducción a la programación",
   description:
@@ -12,7 +17,7 @@ const defaultCourse = {
 };
 
 export default function HomePage() {
-  const initialRole = (globalThis as any).__TEST_ROLE__ ?? ("estudiante" as Role);
+  const initialRole = (globalThis as GlobalThisWithTestRole).__TEST_ROLE__ ?? ("estudiante" as Role);
   const [role] = useState<Role>(initialRole);
   const [theme, setTheme] = useState<"dark" | "light">("dark");
   const [course, setCourse] = useState(defaultCourse);
@@ -98,7 +103,7 @@ export default function HomePage() {
 
         <div className="layout">
           <main>
-            <section ref={cardRef as any} className="card">
+            <section ref={cardRef as React.RefObject<HTMLElement>} className="card">
               <div className="card-header">
                 <div style={{ flex: 1 }}>
                   <div className="field-label">Título</div>
