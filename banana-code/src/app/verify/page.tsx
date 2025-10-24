@@ -24,7 +24,7 @@ export default function VerifyPage() {
         }, 2000);
       })
       .catch(() => setMessage("Error al verificar la cuenta."));
-  }, [token]);
+  }, [token, router]);
 
   return (
     <main className="flex flex-col items-center justify-center min-h-screen text-center">
