@@ -37,7 +37,7 @@ function LoginFormComponent() {
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
     setIsSubmitting(true);
 
-    const result = await signIn("credentials", {
+    await signIn("credentials", {
       redirect: false,
       email: data.email,
       password: data.password,
@@ -50,7 +50,7 @@ function LoginFormComponent() {
 
   const handleOAuthLogin = async (provider: "google" | "azure-ad") => {
     setIsOAuthLoading(provider);
-    const result = await signIn(provider);
+    await signIn(provider);
     // Add code to handle errors or success responses.
 
     setIsOAuthLoading(null);

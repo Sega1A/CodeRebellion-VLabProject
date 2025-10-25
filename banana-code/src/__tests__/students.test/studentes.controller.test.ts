@@ -1,6 +1,35 @@
-import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest } from 'next/server';
 import { GET } from '../../app/api/students/route';
 import prisma from '@/lib/prisma';
+
+// ---------------------------------
+// TYPES (TIPOS)
+// ---------------------------------
+
+type MockCourse = {
+  id: string;
+  name: string;
+  code: string;
+  description?: string | null;
+  startDate?: Date | null;
+  endDate?: Date | null;
+  createdAt?: Date;
+  updatedAt?: Date;
+};
+
+type MockStudent = {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  studentCode: string;
+  enrolledAt: Date;
+  course: {
+    id: string;
+    name: string;
+    code: string;
+  };
+};
 
 // ---------------------------------
 // MOCKS (SIMULACIONES)
@@ -33,7 +62,6 @@ jest.mock('next/server', () => ({
 }));
 
 const mockPrisma = prisma as jest.Mocked<typeof prisma>;
-const mockNextResponseJson = NextResponse.json as jest.Mock;
 
 // ---------------------------------
 // SUITE DE TESTS
@@ -93,13 +121,13 @@ describe('GET /api/students', () => {
   it('should return 200 with the list of students if the course is found', async () => {
     const courseId = 'course-123';
 
-    const mockCourse = {
+    const mockCourse: MockCourse = {
       id: courseId,
       name: 'Ingeniería de Software',
       code: 'IS-101',
     };
 
-    const mockStudents = [
+    const mockStudents: MockStudent[] = [
       {
         id: 'student-1',
         firstName: 'Ana',
@@ -126,8 +154,8 @@ describe('GET /api/students', () => {
       },
     } as unknown as NextRequest;
 
-    (mockPrisma.course.findUnique as jest.Mock).mockResolvedValue(mockCourse as any); // (usamos 'as any' para simplificar el mock)
-    (mockPrisma.student.findMany as jest.Mock).mockResolvedValue(mockStudents as any);
+    (mockPrisma.course.findUnique as jest.Mock).mockResolvedValue(mockCourse);
+    (mockPrisma.student.findMany as jest.Mock).mockResolvedValue(mockStudents);
 
     const response = await GET(request);
 
@@ -176,13 +204,13 @@ describe('GET /api/students', () => {
   it('should return 200 with an empty list if the course has no students', async () => {
     const courseId = 'course-empty';
 
-    const mockCourse = {
+    const mockCourse: MockCourse = {
       id: courseId,
       name: 'Curso Vacío',
       code: 'EMPTY-00',
     };
 
-    const mockStudents: any[] = [];
+    const mockStudents: MockStudent[] = [];
 
     const request = {
       nextUrl: {
@@ -190,7 +218,7 @@ describe('GET /api/students', () => {
       },
     } as unknown as NextRequest;
 
-    (mockPrisma.course.findUnique as jest.Mock).mockResolvedValue(mockCourse as any);
+    (mockPrisma.course.findUnique as jest.Mock).mockResolvedValue(mockCourse);
     (mockPrisma.student.findMany as jest.Mock).mockResolvedValue(mockStudents);
 
     const response = await GET(request);
