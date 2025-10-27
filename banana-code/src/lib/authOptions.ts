@@ -4,7 +4,6 @@ import { AuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import MicrosoftProvider from "next-auth/providers/azure-ad";
-// import KeycloakProvider from "next-auth/providers/keycloak";
 import bcrypt from "bcrypt";
 
 export const authOptions: AuthOptions = {
@@ -26,10 +25,7 @@ export const authOptions: AuthOptions = {
           user.password
         );
         if (!valid) return null;
-        return {
-          ...user,
-          id: user.id.toString(),
-        };
+        return user;
       },
     }),
     GoogleProvider({
@@ -41,11 +37,6 @@ export const authOptions: AuthOptions = {
       clientSecret: process.env.MICROSOFT_CLIENT_SECRET! as string,
       tenantId: process.env.MICROSOFT_TENANT_ID! as string,
     }),
-    // KeycloakProvider({
-    //   clientId: process.env.KEYCLOAK_CLIENT_ID! as string,
-    //   clientSecret: process.env.KEYCLOAK_CLIENT_SECRET! as string,
-    //   issuer: process.env.KEYCLOAK_ISSUER! as string,
-    // }),
   ],
   session: { strategy: "jwt" },
   // pages: { signIn: "/login" },
@@ -77,15 +68,12 @@ export const authOptions: AuthOptions = {
     },
     async signIn({ user }) {
       if (!user) return false;
-      const dbUser = await prisma.user.findUnique({
+      await prisma.user.findUnique({
         where: { id: user.id },
         select: { role: true },
       });
-
-      if (dbUser?.role === "ADMINISTRADOR") return "/admin";
-      if (dbUser?.role === "PROFESOR_EJECUTOR") return "/profesor/editor";
-      if (dbUser?.role === "PROFESOR_EDITOR") return "/profesor/ejecutor";
-      return "/estudiante";
+      // Handle redirection to an specific page per user role in Login form, becouse here it's a chaos xd
+      return true;
     },
   },
 };
