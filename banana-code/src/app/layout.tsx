@@ -9,8 +9,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const routesWithNavbar = ["/vista_curso", "/home", "/estudiante"];
-  const showNavbar = routesWithNavbar.includes(pathname);
+  const routesWithNavbar = ["/home", "/estudiante", "/admin", "/vista_curso"];
+  const showNavbar = routesWithNavbar.some((route) =>
+    pathname.startsWith(route)
+  );
+
   return (
     <html lang="en">
       <body>

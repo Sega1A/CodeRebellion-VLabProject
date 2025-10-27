@@ -6,6 +6,7 @@ import Link from "next/link";
 import { getSession } from "next-auth/react";
 import { UserInfo } from "./types/userInfo-type";
 import { SessionType } from "./types/session-type";
+import { Role } from "@prisma/client";
 
 export default function Navbar() {
   const [theme, setTheme] = useState("light");
@@ -56,6 +57,16 @@ export default function Navbar() {
             Curso
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 group-hover:w-full transition-all duration-300 ease-out"></span>
           </Link>
+
+          {userInfo?.role === Role.ADMINISTRADOR && (
+            <Link
+              href={"/admin/users-list"}
+              className="relative text-gray-700 font-bold hover:text-blue-600 transition-colors duration-300 group py-2 text-inherit"
+            >
+              Usuarios
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 group-hover:w-full transition-all duration-300 ease-out"></span>
+            </Link>
+          )}
         </div>
 
         <div className="right-nav">
