@@ -63,7 +63,6 @@ export const authOptions: AuthOptions = {
       return session;
     },
     async redirect({ url, baseUrl }) {
-      if (url.startsWith("/")) return `${baseUrl}${url}`;
       return baseUrl;
     },
     async signIn({ user }) {

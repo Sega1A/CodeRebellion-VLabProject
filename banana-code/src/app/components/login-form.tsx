@@ -8,6 +8,7 @@ import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import dynamic from "next/dynamic";
 import styles from "./styles/login-form.module.css";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const loginSchema = z.object({
   email: z
@@ -25,6 +26,7 @@ function LoginFormComponent() {
   const [isOAuthLoading, setIsOAuthLoading] = useState<
     "google" | "azure-ad" | null
   >(null);
+  const router = useRouter();
 
   const {
     register,
@@ -35,24 +37,30 @@ function LoginFormComponent() {
   });
 
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
-    setIsSubmitting(true);
+    try {
+      setIsSubmitting(true);
+      const response = await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+      });
+      setIsSubmitting(false);
 
-    await signIn("credentials", {
-      redirect: false,
-      email: data.email,
-      password: data.password,
-      callbackUrl: "/home", // Temporal redirection
-    });
-    // Add code to handle errors or success responses.
-
-    setIsSubmitting(false);
+      if (!response.ok) {
+        throw new Error("Error al autenticar al usuario");
+      }
+      router.push("/home");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error(error.message);
+      }
+    }
   };
 
   const handleOAuthLogin = async (provider: "google" | "azure-ad") => {
     setIsOAuthLoading(provider);
     await signIn(provider);
     // Add code to handle errors or success responses.
-
     setIsOAuthLoading(null);
   };
 
