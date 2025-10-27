@@ -110,7 +110,7 @@ export default function ChangeRole() {
                         handleRoleChange(user.id, e.target.value)
                       }
                       disabled={loadingUserId === user.id}
-                      className="text-xs sm:text-sm p-1 border rounded"
+                      className="text-xs sm:text-sm px-3 py-1.5 border border-gray-300 rounded-lg bg-white shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 disabled:bg-gray-100 disabled:text-gray-400 disabled:cursor-not-allowed transition-all duration-200 ease-in-out"
                     >
                       {roles.map((roleOption) => (
                         <option key={roleOption} value={roleOption}>
