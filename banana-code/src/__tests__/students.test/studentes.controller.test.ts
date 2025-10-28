@@ -39,6 +39,21 @@ type MockEnrollment = {
   };
 };
 
+type MockResponse = {
+  body: {
+    error?: string;
+    success?: boolean;
+    course?: {
+      id: string;
+      name: string;
+      code: string;
+    };
+    count?: number;
+    students?: unknown[];
+  };
+  status: number;
+};
+
 // ---------------------------------
 // MOCKS (SIMULACIONES)
 // ---------------------------------
@@ -98,7 +113,7 @@ describe('GET /api/students', () => {
       },
     } as unknown as NextRequest;
 
-    const response = await GET(request);
+    const response = await GET(request) as unknown as MockResponse;
 
     expect(response.status).toBe(400);
     expect(response.body).toEqual({ error: 'El parámetro courseId es requerido' });
@@ -116,7 +131,7 @@ describe('GET /api/students', () => {
 
     (mockPrisma.course.findUnique as jest.Mock).mockResolvedValue(null);
 
-    const response = await GET(request);
+    const response = await GET(request) as unknown as MockResponse;
 
     expect(mockPrisma.course.findUnique).toHaveBeenCalledWith({
       where: { id: courseId },
@@ -177,7 +192,7 @@ describe('GET /api/students', () => {
     (mockPrisma.course.findUnique as jest.Mock).mockResolvedValue(mockCourse);
     (mockPrisma.enrollment.findMany as jest.Mock).mockResolvedValue(mockEnrollments);
 
-    const response = await GET(request);
+    const response = await GET(request) as unknown as MockResponse;
 
     expect(mockPrisma.course.findUnique).toHaveBeenCalledWith({
       where: { id: courseId },
@@ -199,6 +214,7 @@ describe('GET /api/students', () => {
             studentCode: true,
             phone: true,
             role: true,
+            createdAt: true,
           },
         },
         course: {
@@ -248,7 +264,7 @@ describe('GET /api/students', () => {
     (mockPrisma.course.findUnique as jest.Mock).mockResolvedValue(mockCourse);
     (mockPrisma.enrollment.findMany as jest.Mock).mockResolvedValue(mockEnrollments);
 
-    const response = await GET(request);
+    const response = await GET(request) as unknown as MockResponse;
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
@@ -278,7 +294,7 @@ describe('GET /api/students', () => {
 
     (mockPrisma.course.findUnique as jest.Mock).mockRejectedValue(dbError);
 
-    const response = await GET(request);
+    const response = await GET(request) as unknown as MockResponse;
 
     expect(consoleErrorSpy).toHaveBeenCalledWith(
       'Error al obtener estudiantes:',
