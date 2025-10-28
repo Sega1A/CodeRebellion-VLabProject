@@ -214,7 +214,6 @@ describe('GET /api/students', () => {
             studentCode: true,
             phone: true,
             role: true,
-            createdAt: true,
           },
         },
         course: {
