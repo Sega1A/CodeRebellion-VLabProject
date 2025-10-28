@@ -47,7 +47,6 @@ export async function GET(request: NextRequest) {
             studentCode: true,
             phone: true,
             role: true,
-            createdAt: true,
           },
         },
         course: {
