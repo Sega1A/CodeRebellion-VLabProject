@@ -17,13 +17,21 @@ type MockCourse = {
   updatedAt?: Date;
 };
 
-type MockStudent = {
+type MockUser = {
   id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  studentCode: string;
+  name: string | null;
+  email: string | null;
+  studentCode: string | null;
+  phone: string | null;
+  role: string;
+};
+
+type MockEnrollment = {
+  id: string;
+  userId: string;
+  courseId: string;
   enrolledAt: Date;
+  user: MockUser;
   course: {
     id: string;
     name: string;
@@ -42,7 +50,7 @@ jest.mock('@/lib/prisma', () => ({
     course: {
       findUnique: jest.fn(),
     },
-    student: {
+    enrollment: {
       findMany: jest.fn(),
     },
   },
@@ -127,23 +135,35 @@ describe('GET /api/students', () => {
       code: 'IS-101',
     };
 
-    const mockStudents: MockStudent[] = [
+    const mockEnrollments: MockEnrollment[] = [
       {
-        id: 'student-1',
-        firstName: 'Ana',
-        lastName: 'Gomez',
-        email: 'ana@test.com',
-        studentCode: '1001',
+        id: 'enrollment-1',
+        userId: 'user-1',
+        courseId: courseId,
         enrolledAt: new Date(),
+        user: {
+          id: 'user-1',
+          name: 'Ana Gomez',
+          email: 'ana@test.com',
+          studentCode: '1001',
+          phone: '70123456',
+          role: 'ESTUDIANTE',
+        },
         course: { id: courseId, name: mockCourse.name, code: mockCourse.code }
       },
       {
-        id: 'student-2',
-        firstName: 'Carlos',
-        lastName: 'Zarate',
-        email: 'carlos@test.com',
-        studentCode: '1002',
+        id: 'enrollment-2',
+        userId: 'user-2',
+        courseId: courseId,
         enrolledAt: new Date(),
+        user: {
+          id: 'user-2',
+          name: 'Carlos Zarate',
+          email: 'carlos@test.com',
+          studentCode: '1002',
+          phone: '70123457',
+          role: 'ESTUDIANTE',
+        },
         course: { id: courseId, name: mockCourse.name, code: mockCourse.code }
       },
     ];
@@ -155,7 +175,7 @@ describe('GET /api/students', () => {
     } as unknown as NextRequest;
 
     (mockPrisma.course.findUnique as jest.Mock).mockResolvedValue(mockCourse);
-    (mockPrisma.student.findMany as jest.Mock).mockResolvedValue(mockStudents);
+    (mockPrisma.enrollment.findMany as jest.Mock).mockResolvedValue(mockEnrollments);
 
     const response = await GET(request);
 
@@ -163,20 +183,24 @@ describe('GET /api/students', () => {
       where: { id: courseId },
     });
 
-    expect(mockPrisma.student.findMany).toHaveBeenCalledWith({
+    expect(mockPrisma.enrollment.findMany).toHaveBeenCalledWith({
       where: {
         courseId: courseId,
+        user: {
+          role: 'ESTUDIANTE',
+        },
       },
-      orderBy: {
-        lastName: 'asc',
-      },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        studentCode: true,
-        enrolledAt: true,
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            studentCode: true,
+            phone: true,
+            role: true,
+          },
+        },
         course: {
           select: {
             id: true,
@@ -185,19 +209,22 @@ describe('GET /api/students', () => {
           },
         },
       },
+      orderBy: {
+        user: {
+          name: 'asc',
+        },
+      },
     });
 
     expect(response.status).toBe(200);
-    expect(response.body).toEqual({
-      success: true,
-      course: {
-        id: mockCourse.id,
-        name: mockCourse.name,
-        code: mockCourse.code,
-      },
-      count: mockStudents.length,
-      students: mockStudents,
+    expect(response.body.success).toBe(true);
+    expect(response.body.course).toEqual({
+      id: mockCourse.id,
+      name: mockCourse.name,
+      code: mockCourse.code,
     });
+    expect(response.body.count).toBe(mockEnrollments.length);
+    expect(response.body.students).toHaveLength(2);
   });
 
   // ----- CASO 4: ÉXITO 200 (SIN ESTUDIANTES) -----
@@ -210,7 +237,7 @@ describe('GET /api/students', () => {
       code: 'EMPTY-00',
     };
 
-    const mockStudents: MockStudent[] = [];
+    const mockEnrollments: MockEnrollment[] = [];
 
     const request = {
       nextUrl: {
@@ -219,7 +246,7 @@ describe('GET /api/students', () => {
     } as unknown as NextRequest;
 
     (mockPrisma.course.findUnique as jest.Mock).mockResolvedValue(mockCourse);
-    (mockPrisma.student.findMany as jest.Mock).mockResolvedValue(mockStudents);
+    (mockPrisma.enrollment.findMany as jest.Mock).mockResolvedValue(mockEnrollments);
 
     const response = await GET(request);
 
@@ -234,7 +261,7 @@ describe('GET /api/students', () => {
       count: 0,
       students: [],
     });
-    expect(mockPrisma.student.findMany).toHaveBeenCalled();
+    expect(mockPrisma.enrollment.findMany).toHaveBeenCalled();
   });
 
 
