@@ -33,7 +33,12 @@ export default function RegistroPage() {
       // 👉 Aquí podrías conectar tu backend
       await new Promise((res) => setTimeout(res, 1000));
       setMsg("¡Registro exitoso! Ahora puedes iniciar sesión.");
-    } catch (err) {
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error(err.message);
+      } else {
+        console.error("Error desconocido", err);
+      }
       setMsg("Ocurrió un error. Inténtalo nuevamente.");
     } finally {
       setLoading(false);
@@ -130,7 +135,10 @@ export default function RegistroPage() {
 
           <p className="text-center text-sm mt-4">
             ¿Ya tienes cuenta?{" "}
-            <a href="/login" className="text-amber-600 font-semibold hover:underline">
+            <a
+              href="/login"
+              className="text-amber-600 font-semibold hover:underline"
+            >
               Inicia sesión
             </a>
           </p>
