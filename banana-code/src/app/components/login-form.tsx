@@ -9,6 +9,7 @@ import dynamic from "next/dynamic";
 import styles from "./styles/login-form.module.css";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const loginSchema = z.object({
   email: z
@@ -237,12 +238,14 @@ function LoginFormComponent() {
             <span className="sm:hidden">Microsoft</span>
           </button>
         </div>
-
-        {/* Link de contraseña olvidada */}
         <div className={styles.forgotWrap}>
-          <a href="#" className={styles.forgotLink}>
-            ¿Olvidaste tu contraseña?
-          </a>
+          ¿No tienes una cuenta?.{" "}
+          <Link
+            href="/registro"
+            className="text-amber-600 font-semibold hover:underline"
+          >
+            Registrate
+          </Link>
         </div>
       </div>
     </div>
