@@ -21,14 +21,14 @@ const alertMock = jest.spyOn(window, "alert").mockImplementation(() => {});
 
 // Mock de requestAnimationFrame y cancelAnimationFrame para evitar errores en JSDOM
 // La implementación simple llama al callback inmediatamente.
-const rafMock = jest
+jest
   .spyOn(window, "requestAnimationFrame")
   .mockImplementation((callback: FrameRequestCallback): number => {
     callback(0);
     return 1; // Devuelve un ID de frame simulado
   });
 
-const cafMock = jest
+jest
   .spyOn(window, "cancelAnimationFrame")
   .mockImplementation(() => {});
 
