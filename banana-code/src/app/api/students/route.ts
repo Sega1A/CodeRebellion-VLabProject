@@ -3,7 +3,7 @@ import prisma from '@/lib/prisma';
 
 /**
  * GET /api/students?courseId=xxx
- * Obtiene la lista de estudiantes de un curso específico
+ * Obtiene la lista de estudiantes (usuarios con role ESTUDIANTE) de un curso específico
  */
 export async function GET(request: NextRequest) {
   try {
@@ -30,21 +30,25 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Obtener los estudiantes del curso
-    const students = await prisma.student.findMany({
+    // Obtener los estudiantes inscritos en el curso
+    const enrollments = await prisma.enrollment.findMany({
       where: {
         courseId: courseId,
+        user: {
+          role: 'ESTUDIANTE', // Solo usuarios con rol estudiante
+        },
       },
-      orderBy: {
-        lastName: 'asc',
-      },
-      select: {
-        id: true,
-        firstName: true,
-        lastName: true,
-        email: true,
-        studentCode: true,
-        enrolledAt: true,
+      include: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            studentCode: true,
+            phone: true,
+            role: true,
+          },
+        },
         course: {
           select: {
             id: true,
@@ -53,7 +57,24 @@ export async function GET(request: NextRequest) {
           },
         },
       },
+      orderBy: {
+        user: {
+          name: 'asc',
+        },
+      },
     });
+
+    // Transformar los datos para que coincidan con el formato esperado
+    const students = enrollments.map((enrollment) => ({
+      id: enrollment.user.id,
+      firstName: enrollment.user.name?.split(' ')[0] || '',
+      lastName: enrollment.user.name?.split(' ').slice(1).join(' ') || '',
+      email: enrollment.user.email || '',
+      studentCode: enrollment.user.studentCode || '',
+      phone: enrollment.user.phone || '',
+      enrolledAt: enrollment.enrolledAt,
+      course: enrollment.course,
+    }));
 
     return NextResponse.json({
       success: true,

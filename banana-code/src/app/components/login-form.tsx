@@ -8,6 +8,8 @@ import { Eye, EyeOff, Mail, Lock } from "lucide-react";
 import dynamic from "next/dynamic";
 import styles from "./styles/login-form.module.css";
 import { signIn } from "next-auth/react";
+import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const loginSchema = z.object({
   email: z
@@ -25,6 +27,7 @@ function LoginFormComponent() {
   const [isOAuthLoading, setIsOAuthLoading] = useState<
     "google" | "azure-ad" | null
   >(null);
+  const router = useRouter();
 
   const {
     register,
@@ -35,24 +38,30 @@ function LoginFormComponent() {
   });
 
   const onSubmit: SubmitHandler<LoginFormInputs> = async (data) => {
-    setIsSubmitting(true);
+    try {
+      setIsSubmitting(true);
+      const response = await signIn("credentials", {
+        redirect: false,
+        email: data.email,
+        password: data.password,
+      });
+      setIsSubmitting(false);
 
-    const result = await signIn("credentials", {
-      redirect: false,
-      email: data.email,
-      password: data.password,
-      callbackUrl: "/home", // Temporal redirection
-    });
-    // Add code to handle errors or success responses.
-
-    setIsSubmitting(false);
+      if (!response.ok) {
+        throw new Error("Error al autenticar al usuario");
+      }
+      router.push("/home");
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error(error.message);
+      }
+    }
   };
 
   const handleOAuthLogin = async (provider: "google" | "azure-ad") => {
     setIsOAuthLoading(provider);
-    const result = await signIn(provider);
+    await signIn(provider);
     // Add code to handle errors or success responses.
-
     setIsOAuthLoading(null);
   };
 
@@ -229,12 +238,14 @@ function LoginFormComponent() {
             <span className="sm:hidden">Microsoft</span>
           </button>
         </div>
-
-        {/* Link de contraseña olvidada */}
         <div className={styles.forgotWrap}>
-          <a href="#" className={styles.forgotLink}>
-            ¿Olvidaste tu contraseña?
-          </a>
+          ¿No tienes una cuenta?.{" "}
+          <Link
+            href="/registro"
+            className="text-amber-600 font-semibold hover:underline"
+          >
+            Registrate
+          </Link>
         </div>
       </div>
     </div>

@@ -8,17 +8,20 @@ datasource db {
 }
 
 model User {
-  id             String   @id @default(cuid())
+  id             String        @id @default(cuid())
   name           String?
-  email          String?  @unique
+  email          String?       @unique
   password       String?
   emailVerified  DateTime?
   image          String?
-  role           Role     @default(ESTUDIANTE)
+  role           Role          @default(ESTUDIANTE)
+  studentCode    String?       @unique
+  phone          String?
   accounts       Account[]
   sessions       Session[]
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  enrollments    Enrollment[]
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
 }
 
 enum Role {
@@ -65,26 +68,26 @@ model VerificationToken {
 }
 
 model Course {
-  id          String   @id @default(cuid())
+  id          String       @id @default(cuid())
   name        String
   description String?
-  code        String   @unique
+  code        String       @unique
   startDate   DateTime?
   endDate     DateTime?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  students    Student[]
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  enrollments Enrollment[]
 }
 
-model Student {
-  id          String   @id @default(cuid())
-  firstName   String
-  lastName    String
-  email       String   @unique
-  studentCode String   @unique
-  courseId    String
-  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
-  enrolledAt  DateTime @default(now())
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model Enrollment {
+  id         String   @id @default(cuid())
+  userId     String
+  courseId   String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  enrolledAt DateTime @default(now())
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@unique([userId, courseId])
 }
