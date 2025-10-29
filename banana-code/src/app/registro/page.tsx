@@ -1,5 +1,9 @@
 "use client";
+
+import Link from "next/link";
 import React, { useState } from "react";
+import { UserRegister } from "./types/UserRegister";
+import { useRouter } from "next/navigation";
 
 export default function RegistroPage() {
   const [form, setForm] = useState({
@@ -10,6 +14,7 @@ export default function RegistroPage() {
   });
   const [loading, setLoading] = useState(false);
   const [msg, setMsg] = useState<string | null>(null);
+  const router = useRouter();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -18,7 +23,6 @@ export default function RegistroPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!form.nombre || !form.email || !form.password || !form.confirmar) {
       setMsg("Por favor completa todos los campos.");
       return;
@@ -27,21 +31,49 @@ export default function RegistroPage() {
       setMsg("Las contraseñas no coinciden.");
       return;
     }
-
     try {
       setLoading(true);
-      // 👉 Aquí podrías conectar tu backend
-      await new Promise((res) => setTimeout(res, 1000));
-      setMsg("¡Registro exitoso! Ahora puedes iniciar sesión.");
+      const user: UserRegister = {
+        email: form.email,
+        password: form.password,
+        name: form.nombre,
+      };
+      await registerUser(user);
     } catch (err: unknown) {
       if (err instanceof Error) {
-        console.error(err.message);
-      } else {
-        console.error("Error desconocido", err);
+        console.error(err.message ?? "Error desconocido");
       }
       setMsg("Ocurrió un error. Inténtalo nuevamente.");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const registerUser = async (user: UserRegister) => {
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(user),
+      });
+      const { message } = (await response.json()) ?? null;
+      if (!response.ok) {
+        setMsg(message ?? "No se pudo agregar al usuario");
+        return;
+      }
+      setMsg(message ?? "Usuario registrado");
+      setTimeout(() => {
+        router.push("/home");
+      }, 3000);
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        setMsg(
+          error.message ??
+            "Ocurrio un error al registrar el usuari. Intentelo nuevamente"
+        );
+      }
     }
   };
 
@@ -135,12 +167,12 @@ export default function RegistroPage() {
 
           <p className="text-center text-sm mt-4">
             ¿Ya tienes cuenta?{" "}
-            <a
-              href="/login"
+            <Link
+              href="/"
               className="text-amber-600 font-semibold hover:underline"
             >
               Inicia sesión
-            </a>
+            </Link>
           </p>
         </form>
       </div>

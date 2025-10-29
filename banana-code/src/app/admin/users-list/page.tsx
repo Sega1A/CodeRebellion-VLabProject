@@ -50,7 +50,7 @@ export default function ChangeRole() {
   };
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 mx-5">
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
         {/* Course Header */}
         <div className="border-b border-gray-200 px-4 sm:px-6 py-4">
