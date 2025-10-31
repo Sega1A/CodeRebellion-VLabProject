@@ -1,77 +1,186 @@
 import React from "react";
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen, fireEvent, waitFor } from "@testing-library/react";
+import "@testing-library/jest-dom"; 
+import HomePage from "@/app/vista_curso/page"; 
 
-import "@testing-library/jest-dom";
-import HomePage from "@/app/vista_curso/page";
 
-// Type for globalThis with test role
+
+
+type Role = "estudiante" | "profesorEditor" | "admin";
 interface GlobalThisWithTestRole {
-  __TEST_ROLE__?: string;
+  __TEST_ROLE__?: Role;
 }
 
-global.alert = jest.fn();
-global.console.log = jest.fn();
+
+const setTestRole = (role: Role) => {
+  (globalThis as GlobalThisWithTestRole).__TEST_ROLE__ = role;
+};
 
 
-jest.mock("@/app/vista_curso/styles.css", () => ({}));
+const alertMock = jest.spyOn(window, "alert").mockImplementation(() => {});
 
-describe("HomePage - Vista Curso (app/vista_curso/page.tsx)", () => {
-  beforeEach(() => {
-    jest.clearAllMocks();
+
+jest
+  .spyOn(window, "requestAnimationFrame")
+  .mockImplementation((callback: FrameRequestCallback): number => {
+    callback(0);
+    return 1; 
   });
+
+jest
+  .spyOn(window, "cancelAnimationFrame")
+  .mockImplementation(() => {});
+
+
+const addEventListenerMock = jest.spyOn(window, "addEventListener");
+const removeEventListenerMock = jest.spyOn(window, "removeEventListener");
+
+
+beforeEach(() => {
+  jest.clearAllMocks();
   
-  jest.spyOn(window, "alert").mockImplementation(() => {});
+  delete (globalThis as GlobalThisWithTestRole).__TEST_ROLE__;
+});
 
-  test("renderiza título y descripción por defecto", () => {
+
+
+describe("HomePage Component", () => {
+  const defaultTitle = "Introducción a la programación";
+  const defaultDesc =
+    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nisl ligula, pulvinar accumsan varius et, volutpat eget ipsum. Sed at libero vel turpis blandit sollicitudin vitae nec lectus.";
+
+  it("1. Renderiza como 'estudiante' (solo lectura)", () => {
+    setTestRole("estudiante");
     render(<HomePage />);
-    expect(screen.getByText("Introducción a la programación")).toBeInTheDocument();
-    expect(screen.getByText(/Lorem ipsum dolor sit amet/i)).toBeInTheDocument();
+
+    
+    expect(screen.getByRole("heading", { name: defaultTitle })).toBeInTheDocument();
+    expect(screen.getByText(defaultDesc)).toBeInTheDocument();
+
+    
+    expect(screen.queryByRole("button", { name: /Editar/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Guardar/i })).not.toBeInTheDocument();
   });
 
-  test("alternar tema cambia la clase del contenedor", () => {
-    const { container } = render(<HomePage />);
-    const themeButton = screen.getByLabelText("Toggle theme");
-    const root = container.querySelector(".container");
+  it("2. Renderiza como 'profesorEditor' (modo vista)", () => {
+    setTestRole("profesorEditor");
+    render(<HomePage />);
 
-    expect(root).toHaveClass("theme-dark");
+    
+    expect(screen.getByRole("heading", { name: defaultTitle })).toBeInTheDocument();
 
-    fireEvent.click(themeButton);
-    expect(root).toHaveClass("theme-light");
+    
+    expect(screen.getByRole("button", { name: /Editar/i })).toBeInTheDocument();
 
-    fireEvent.click(themeButton);
-    expect(root).toHaveClass("theme-dark");
+    
+    expect(screen.queryByRole("button", { name: /Guardar/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Cancelar/i })).not.toBeInTheDocument();
   });
 
-  test("flujo de edición: mostrar Editar, editar y guardar (mock role)", () => {
-    (globalThis as GlobalThisWithTestRole).__TEST_ROLE__ = "profesorEditor";
-    try {
-      render(<HomePage />);
+  it("3. Renderiza como 'admin' (modo vista)", () => {
+    setTestRole("admin");
+    render(<HomePage />);
 
-      
-      const editBtn = screen.getByText("Editar");
-      expect(editBtn).toBeInTheDocument();
-
-      
-      fireEvent.click(editBtn);
-
-      
-      expect(screen.getByText("Guardar")).toBeInTheDocument();
-      expect(screen.getByText("Cancelar")).toBeInTheDocument();
-
-      
-      const titleInput = screen.getByDisplayValue("Introducción a la programación");
-      expect(titleInput).toBeInTheDocument();
-
-      
-      fireEvent.change(titleInput, { target: { value: "Nuevo Título" } });
-      fireEvent.click(screen.getByText("Guardar"));
-
-      
-      expect(screen.getByText("Nuevo Título")).toBeInTheDocument();
-      expect(window.alert).toHaveBeenCalled();
-    } finally {
-      delete (globalThis as GlobalThisWithTestRole).__TEST_ROLE__;
-    }
+    
+    expect(screen.getByRole("button", { name: /Editar/i })).toBeInTheDocument();
   });
 
+  it("4. Permite el flujo completo de Edición y Guardado", async () => {
+    setTestRole("profesorEditor");
+    render(<HomePage />);
+
+    
+    fireEvent.click(screen.getByRole("button", { name: /Editar/i }));
+
+    
+    expect(screen.queryByRole("button", { name: /Editar/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Guardar/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Cancelar/i })).toBeInTheDocument();
+
+    
+    const titleInput = screen.getByDisplayValue(defaultTitle);
+    const descTextarea = screen.getByDisplayValue(defaultDesc);
+
+    
+    const newTitle = "Nuevo Título del Curso";
+    const newDesc = "Esta es la nueva descripción.";
+    fireEvent.change(titleInput, { target: { value: newTitle } });
+    fireEvent.change(descTextarea, { target: { value: newDesc } });
+
+    
+    fireEvent.click(screen.getByRole("button", { name: /Guardar/i }));
+
+    
+    await waitFor(() => {
+      expect(screen.queryByRole("button", { name: /Guardar/i })).not.toBeInTheDocument();
+    });
+    
+    expect(screen.getByRole("button", { name: /Editar/i })).toBeInTheDocument();
+
+    
+    expect(screen.getByRole("heading", { name: newTitle })).toBeInTheDocument();
+    expect(screen.getByText(newDesc)).toBeInTheDocument();
+
+    
+    expect(alertMock).toHaveBeenCalledTimes(1);
+    expect(alertMock).toHaveBeenCalledWith("Guardado exitoso: " + newTitle);
+  });
+
+  it("5. Permite cancelar la edición", () => {
+    setTestRole("profesorEditor");
+    render(<HomePage />);
+
+    
+    fireEvent.click(screen.getByRole("button", { name: /Editar/i }));
+
+    
+    const titleInput = screen.getByDisplayValue(defaultTitle);
+    const descTextarea = screen.getByDisplayValue(defaultDesc);
+    fireEvent.change(titleInput, { target: { value: "Título Temporal" } });
+    fireEvent.change(descTextarea, { target: { value: "Descripción Temporal" } });
+
+    
+    fireEvent.click(screen.getByRole("button", { name: /Cancelar/i }));
+
+    
+    expect(screen.queryByRole("button", { name: /Guardar/i })).not.toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Editar/i })).toBeInTheDocument();
+
+    
+    expect(screen.getByRole("heading", { name: defaultTitle })).toBeInTheDocument();
+    expect(screen.getByText(defaultDesc)).toBeInTheDocument();
+
+    
+    expect(screen.queryByText("Título Temporal")).not.toBeInTheDocument();
+  });
+
+  it("6. Añade y elimina event listeners de 'scroll' y 'mousemove' al montar/desmontar", () => {
+    const { unmount } = render(<HomePage />);
+
+    
+    expect(addEventListenerMock).toHaveBeenCalledWith(
+      "scroll",
+      expect.any(Function),
+      { passive: true }
+    );
+    expect(addEventListenerMock).toHaveBeenCalledWith(
+      "mousemove",
+      expect.any(Function)
+    );
+
+    
+    unmount();
+
+    
+    expect(removeEventListenerMock).toHaveBeenCalledWith(
+      "scroll",
+      expect.any(Function)
+    );
+    expect(removeEventListenerMock).toHaveBeenCalledWith(
+      "mousemove",
+      expect.any(Function)
+    );
+
+   
+  });
 });
