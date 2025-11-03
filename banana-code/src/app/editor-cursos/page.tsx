@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { BookOpen, FileText, Code, Plus, ChevronDown, ChevronRight, Save, ArrowLeft, GripVertical, Trash2, Lock, Unlock, Check, Menu, X } from 'lucide-react';
+import { BookOpen, FileText, Code, Plus, ChevronDown, ChevronRight, GripVertical, Trash2, Lock, Unlock, X } from 'lucide-react';
 import EditorCurso from '../components/navbar/EditorCurso';
 
 interface ContentBlock {
