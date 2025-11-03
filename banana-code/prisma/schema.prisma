@@ -71,7 +71,13 @@ model Course {
   id          String       @id @default(cuid())
   name        String
   description String?
-  code        String       @unique
+  code        String?      @unique
+  title       String       @default("Nuevo Curso")
+  students    Int          @default(0)
+  topics      Int          @default(0)
+  progress    Int          @default(0)
+  content     Json         @default("{\"topics\":[]}")
+  lastUpdated DateTime     @default(now()) @updatedAt
   startDate   DateTime?
   endDate     DateTime?
   createdAt   DateTime     @default(now())
