@@ -12,6 +12,31 @@ const defaultCourse = {
   title: "Introducción a la programación",
   description:
     "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nisl ligula, pulvinar accumsan varius et, volutpat eget ipsum. Sed at libero vel turpis blandit sollicitudin vitae nec lectus.",
+  instructor: "COSTAS JAUREGUI VLADIMIR ABEL",
+  topics: [
+    {
+      id: 1,
+      title: "Variables y tipos de datos",
+      content: "Declaración de variables, etc...",
+      subtopics: [
+        {
+          id: 101,
+          title: "Tipos de datos primitivos",
+          content: "contenido ... etc..."
+        }
+      ]
+    },
+    {
+      id: 2,
+      title: "Estructuras de control",
+      content: "Contenido sobre estructuras de control"
+    },
+    {
+      id: 3,
+      title: "Funciones y mod",
+      content: "Contenido sobre funciones"
+    }
+  ]
 };
 
 export default function HomePage() {
@@ -23,6 +48,8 @@ export default function HomePage() {
   const [draft, setDraft] = useState(course);
   const [scrollY, setScrollY] = useState(0);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [currentView, setCurrentView] = useState<"preview" | "topics">("preview");
+  const [selectedTopic, setSelectedTopic] = useState<number | null>(null);
 
   const editable = role === "profesorEditor" || role === "admin";
   const cardRef = useRef<HTMLElement | null>(null);
@@ -86,6 +113,16 @@ export default function HomePage() {
     setDraft(course);
     setEditing(false);
   }
+  
+  function goToTopics() {
+    setCurrentView("topics");
+    setSelectedTopic(1); // Seleccionar el primer tópico por defecto
+  }
+  
+  function goToPreview() {
+    setCurrentView("preview");
+    setSelectedTopic(null);
+  }
 
   // Parallax effect calculation
   const parallaxLeft = Math.min(scrollY * 0.08, 150);
@@ -98,370 +135,216 @@ export default function HomePage() {
   // Mouse hover effect
   const mouseInfluenceLeft = (mousePos.x / window.innerWidth - 0.5) * 20;
   const mouseInfluenceRight = (mousePos.x / window.innerWidth - 0.5) * -20;
-
-  return (
-    <>
-      <style>{`
-        @keyframes fadeInUp {
-          from { opacity: 0; transform: translateY(18px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes bananaEntranceLeft {
-          0% { 
-            opacity: 0; 
-            transform: translateY(-50%) translateX(-200px) rotate(-45deg) scale(0.3);
-          }
-          60% {
-            opacity: 0.15;
-            transform: translateY(-50%) translateX(20px) rotate(-10deg) scale(1.05);
-          }
-          100% { 
-            opacity: 0.12; 
-            transform: translateY(-50%) translateX(0) rotate(-15deg) scale(1);
-          }
-        }
-
-        @keyframes bananaEntranceRight {
-          0% { 
-            opacity: 0; 
-            transform: translateY(-50%) translateX(200px) rotate(45deg) scale(0.3);
-          }
-          60% {
-            opacity: 0.15;
-            transform: translateY(-50%) translateX(-20px) rotate(20deg) scale(1.05);
-          }
-          100% { 
-            opacity: 0.12; 
-            transform: translateY(-50%) translateX(0) rotate(15deg) scale(1);
-          }
-        }
-
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-
-        @keyframes gradientShift {
-          0% { background-position: 0% 50%; }
-          50% { background-position: 100% 50%; }
-          100% { background-position: 0% 50%; }
-        }
-        
-        .course-page-wrapper {
-          min-height: calc(100vh - 80px);
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-          position: relative;
-        }
-
-        .course-theme-light {
-          background: linear-gradient(135deg, #fef5e7 0%, #fef9f3 25%, #fdf6ec 50%, #fef9f3 75%, #fef5e7 100%);
-          background-size: 200% 200%;
-          animation: gradientShift 15s ease infinite;
-          color: #2d3436;
-        }
-
-        .course-banana-left,
-        .course-banana-right {
-          position: fixed;
-          font-size: 350px;
-          pointer-events: none;
-          z-index: 0;
-          transition: none;
-          will-change: transform;
-          opacity: 0.12;
-        }
-
-        .course-banana-left {
-          left: -150px;
-          top: 50%;
-          animation: bananaEntranceLeft 1.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-
-        .course-banana-right {
-          right: -150px;
-          top: 50%;
-          animation: bananaEntranceRight 1.4s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-
-        .course-particles {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          pointer-events: none;
-          z-index: 1;
-          overflow: hidden;
-        }
-
-        .course-particle {
-          position: absolute;
-          width: 6px;
-          height: 6px;
-          background: radial-gradient(circle, rgba(255, 215, 0, 0.4) 0%, rgba(255, 193, 7, 0) 70%);
-          border-radius: 50%;
-          animation: float 6s ease-in-out infinite;
-          opacity: 0.3;
-        }
-
-        .course-page-inner {
-          max-width: 1400px;
-          margin: 0 auto;
-          padding: 20px 16px;
-          position: relative;
-          z-index: 2;
-        }
-
-        @media (min-width: 768px) {
-          .course-page-inner {
-            padding: 40px 24px;
-          }
-        }
-
-        .course-page-layout {
-          display: grid;
-          grid-template-columns: 1fr;
-          gap: 24px;
-          margin-bottom: 40px;
-        }
-
-        .course-page-card {
-          border-radius: 20px;
-          padding: 24px;
-          box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
-          opacity: 0;
-          transition: transform 0.3s ease, box-shadow 0.3s ease;
-          background: rgba(255, 255, 255, 0.95);
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(0, 0, 0, 0.06);
-        }
-
-        @media (min-width: 768px) {
-          .course-page-card {
-            padding: 40px;
-          }
-        }
-
-        .course-page-card:hover {
-          transform: translateY(-4px);
-          box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12);
-        }
-
-        .course-card-header {
-          display: flex;
-          flex-direction: column;
-          gap: 16px;
-          margin-bottom: 24px;
-        }
-
-        @media (min-width: 768px) {
-          .course-card-header {
-            flex-direction: row;
-            justify-content: space-between;
-            gap: 24px;
-          }
-        }
-
-        .course-field-label {
-          font-size: 11px;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          opacity: 0.5;
-          margin-bottom: 12px;
-          font-weight: 700;
-          color: #666;
-        }
-
-        .course-card-title {
-          font-size: 32px;
-          font-weight: 800;
-          margin-bottom: 28px;
-          color: #1a1a1a;
-          line-height: 1.2;
-        }
-
-        .course-card-description {
-          line-height: 1.8;
-          opacity: 0.75;
-          font-size: 16px;
-          color: #4a4a4a;
-        }
-
-        .course-input, .course-textarea {
-          width: 100%;
-          padding: 14px 16px;
-          border-radius: 12px;
-          border: 2px solid rgba(0, 0, 0, 0.1);
-          font-family: inherit;
-          font-size: 16px;
-          transition: all 0.3s;
-          margin-bottom: 16px;
-          background: white;
-          color: #2d3748;
-        }
-
-        .course-input:focus, .course-textarea:focus {
-          outline: none;
-          border-color: #3b82f6;
-          box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
-        }
-
-        .course-textarea {
-          min-height: 140px;
-          resize: vertical;
-        }
-
-        .course-controls {
-          display: flex;
-          flex-direction: column;
-          gap: 12px;
-        }
-
-        .course-button {
-          padding: 14px 28px;
-          border: none;
-          border-radius: 12px;
-          font-weight: 700;
-          cursor: pointer;
-          transition: all 0.3s;
-          font-size: 15px;
-        }
-
-        .course-btn-primary {
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-        }
-
-        .course-btn-primary:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
-        }
-
-        .course-btn-save {
-          background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-          color: white;
-        }
-
-        .course-btn-save:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 24px rgba(16, 185, 129, 0.4);
-        }
-
-        .course-btn {
-          background: rgba(128, 128, 128, 0.15);
-          color: #4a4a4a;
-          font-weight: 600;
-        }
-
-        .course-btn:hover {
-          background: rgba(128, 128, 128, 0.25);
-        }
-
-        .course-card-footer {
-          padding-top: 24px;
-          border-top: 1px solid rgba(0, 0, 0, 0.08);
-          font-size: 13px;
-          opacity: 0.4;
-          font-style: italic;
-          color: #666;
-        }
-      `}</style>
-
-      <div className={`course-page-wrapper ${theme === "dark" ? "theme-dark" : "course-theme-light"}`}>
-        {theme === "light" && (
-          <>
-            <div 
-              className="course-banana-left"
-              style={{
-                transform: `translateY(calc(-50% + ${parallaxLeft + velocityEffect}px)) rotate(-15deg) translateX(${mouseInfluenceLeft}px)`
-              }}
-            >
-              🍌
-            </div>
-            <div 
-              className="course-banana-right"
-              style={{
-                transform: `translateY(calc(-50% + ${parallaxRight + velocityEffect}px)) rotate(15deg) translateX(${mouseInfluenceRight}px)`
-              }}
-            >
-              🍌
+  
+  // Renderizar la vista previa del curso
+  const renderCoursePreview = () => {
+    return (
+      <div className="flex flex-col items-center justify-start min-h-screen bg-gradient-to-b from-orange-50 to-gray-50 p-0 pt-2">
+        <div className="w-[98vw] max-w-[1600px] bg-white rounded-lg shadow-lg overflow-hidden border-t-4 border-orange-500 mx-auto">
+          <div className="p-3 md:p-4">
+            <div className="flex items-center justify-between mb-3">
+              <button className="text-orange-600 hover:text-orange-800 flex items-center text-base">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                Mis cursos
+              </button>
+              <h1 className="text-2xl font-semibold text-center flex-grow">{course.title}</h1>
+              <div className="flex items-center gap-2">
+                {!editing && editable && (
+                  <button
+                    onClick={startEdit}
+                    className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors text-sm"
+                  >
+                    Editar
+                  </button>
+                )}
+                {editing && (
+                  <>
+                    <button
+                      onClick={onSave}
+                      className="bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 shadow-sm transition-colors text-sm"
+                    >
+                      Guardar
+                    </button>
+                    <button
+                      onClick={onCancel}
+                      className="border border-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-50 transition-colors text-sm"
+                    >
+                      Cancelar
+                    </button>
+                  </>
+                )}
+              </div>
             </div>
             
-            <div className="course-particles">
-              {[...Array(10)].map((_, i) => (
-                <div
-                  key={i}
-                  className="course-particle"
-                  style={{
-                    left: `${8 + i * 10}%`,
-                    top: `${15 + (i % 4) * 22}%`,
-                    animationDelay: `${i * 0.7}s`,
-                    animationDuration: `${5 + (i % 3)}s`
-                  }}
-                />
-              ))}
-            </div>
-          </>
-        )}
-
-        <div className="course-page-inner">
-          <div className="course-page-layout">
-            <main>
-              <section ref={cardRef as React.RefObject<HTMLElement>} className="course-page-card">
-                <div className="course-card-header">
-                  <div style={{ flex: 1 }}>
-                    <div className="course-field-label">Título</div>
-                    {!editing ? (
-                      <h2 className="course-card-title">{course.title}</h2>
-                    ) : (
-                      <input
-                        className="course-input"
-                        value={draft.title}
-                        onChange={(e) => setDraft({ ...draft, title: e.target.value })}
-                      />
-                    )}
-
-                    <div className="course-field-label">Descripción</div>
-                    {!editing ? (
-                      <p className="course-card-description">{course.description}</p>
-                    ) : (
-                      <textarea
-                        className="course-textarea"
-                        value={draft.description}
-                        onChange={(e) => setDraft({ ...draft, description: e.target.value })}
-                      />
-                    )}
+            <div className="bg-orange-50 rounded-lg p-3 mb-4 border-l-4 border-orange-400">
+              <h2 className="text-xl font-medium mb-2 text-orange-700">Información del curso</h2>
+              {!editing ? (
+                <>
+                  <div className="mb-2">
+                    <p className="text-base text-gray-600 mb-1">Docente:</p>
+                    <p className="font-medium text-base">{course.instructor}</p>
                   </div>
-
-                  {editable && (
-                    <div className="course-controls">
-                      {!editing ? (
-                        <button id="editBtn" className="course-button course-btn-primary" onClick={startEdit}>
-                          Editar
-                        </button>
-                      ) : (
-                        <>
-                          <button id="saveBtn" className="course-button course-btn-save" onClick={onSave}>
-                            Guardar
-                          </button>
-                          <button className="course-button course-btn" onClick={onCancel}>
-                            Cancelar
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  )}
+                  <div className="mb-1">
+                    <p className="text-base text-gray-600 mb-1">Descripción:</p>
+                    <p className="text-base">{course.description}</p>
+                  </div>
+                </>
+              ) : (
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Título</label>
+                    <input
+                      type="text"
+                      value={draft.title}
+                      onChange={(e) => setDraft({ ...draft, title: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none text-base"
+                      placeholder="Nuevo título"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Descripción</label>
+                    <textarea
+                      value={draft.description}
+                      onChange={(e) => setDraft({ ...draft, description: e.target.value })}
+                      rows={4}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-orange-400 focus:border-transparent outline-none text-base resize-none"
+                      placeholder="Nueva descripción"
+                    />
+                  </div>
                 </div>
-
-                <footer className="course-card-footer">
-                  endpoint para devolver la información del curso (simulado)
-                </footer>
-              </section>
-            </main>
+              )}
+            </div>
+            
+            <div className="mb-4 flex flex-col items-center">
+              <h2 className="text-xl font-medium mb-2 text-orange-700">Contenido del curso</h2>
+              <div className="space-y-2 w-full">
+                {course.topics.map((topic) => (
+                  <div key={topic.id} className="border border-gray-200 rounded-md p-3 hover:border-orange-300 hover:bg-orange-50 transition-colors">
+                    <h3 className="font-medium text-base">{topic.title}</h3>
+                  </div>
+                ))}
+              </div>
+            </div>
+            
+            <div className="flex justify-center">
+              <button 
+                onClick={goToTopics}
+                className="bg-orange-500 hover:bg-orange-600 text-white font-medium py-3 px-10 rounded-md transition-colors shadow-md text-lg"
+              >
+                Comenzar curso
+              </button>
+            </div>
           </div>
         </div>
       </div>
-    </>
+    );
+  };
+  
+  // Renderizar la vista de tópicos del curso
+  const renderTopicsView = () => {
+    const currentTopic = course.topics.find(t => t.id === selectedTopic) || course.topics[0];
+    const isFirstTopic = selectedTopic === 1;
+    
+    return (
+      <div className="flex flex-col items-center justify-start min-h-screen bg-gradient-to-b from-orange-50 to-gray-50 p-0 pt-2">
+        <div className="w-[98vw] max-w-[1600px] bg-white rounded-lg shadow-lg overflow-hidden border-t-4 border-orange-500 mx-auto">
+          <div className="p-3 md:p-4">
+            <div className="flex items-center justify-between mb-3">
+              <button 
+                onClick={goToPreview}
+                className="text-orange-600 hover:text-orange-800 flex items-center text-base"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                Mis cursos
+              </button>
+              <h1 className="text-2xl font-semibold text-center flex-grow">{course.title}</h1>
+              <div className="w-16"></div> {/* Espacio reducido para equilibrar el diseño */}
+            </div>
+            
+            <div className="flex flex-col md:flex-row gap-3">
+              {/* Sidebar con tópicos */}
+              <div className="w-full md:w-1/4 lg:w-1/5">
+                <h2 className="text-xl font-medium mb-2">Tópicos del curso</h2>
+                <div className="space-y-1">
+                  {course.topics.map((topic) => (
+                    <button
+                      key={topic.id}
+                      onClick={() => setSelectedTopic(topic.id)}
+                      className={`w-full text-left p-2 rounded-md border ${
+                        selectedTopic === topic.id 
+                          ? "bg-orange-50 border-orange-300" 
+                          : "border-gray-200 hover:bg-gray-50"
+                      }`}
+                    >
+                      <p className="font-medium text-base truncate">{topic.id}. {topic.title}</p>
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              {/* Contenido del tópico seleccionado */}
+              <div className="w-full md:w-3/4 lg:w-4/5 border border-orange-200 rounded-lg p-3 bg-white shadow-sm">
+                <h2 className="text-xl font-medium mb-2 text-orange-700 text-center">{currentTopic.id}. {currentTopic.title}</h2>
+                <div className="prose max-w-none">
+                  <p className="text-base text-gray-600 text-center mb-2">Contenido del tópico seleccionado</p>
+                  <p className="text-base text-center">{currentTopic.content}</p>
+                  
+                  {currentTopic.subtopics && currentTopic.subtopics.length > 0 && (
+                    <div className="mt-4">
+                      <ul className="list-disc pl-5 space-y-2">
+                        {currentTopic.subtopics.map(subtopic => (
+                          <li key={subtopic.id}>
+                            <h3 className="font-medium text-orange-600 text-lg">{subtopic.title}</h3>
+                            <p className="text-base">{subtopic.content}</p>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+                
+                <div className="flex justify-between mt-4">
+                  <button 
+                    className="border border-orange-300 text-orange-700 px-5 py-2 rounded-md hover:bg-orange-50 transition-colors text-base"
+                    disabled={isFirstTopic}
+                    onClick={() => {
+                      if (selectedTopic && selectedTopic > 1) {
+                        setSelectedTopic(selectedTopic - 1);
+                      }
+                    }}
+                  >
+                    Anterior
+                  </button>
+                  <button 
+                    className="bg-orange-500 text-white px-5 py-2 rounded-md hover:bg-orange-600 shadow-sm transition-colors text-base"
+                    disabled={selectedTopic === course.topics.length}
+                    onClick={() => {
+                      if (selectedTopic && selectedTopic < course.topics.length) {
+                        setSelectedTopic(selectedTopic + 1);
+                      }
+                    }}
+                  >
+                    Siguiente
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="bg-gray-100 p-2 text-center text-sm text-gray-500">
+            Estado del Curso: Activo
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  return (
+    <div className={`min-h-screen ${theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-gray-900"}`}>
+      {currentView === "preview" ? renderCoursePreview() : renderTopicsView()}
+    </div>
   );
 }
