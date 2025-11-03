@@ -46,8 +46,7 @@ export default function HomePage() {
   const [course, setCourse] = useState(defaultCourse);
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState(course);
-  const [scrollY, setScrollY] = useState(0);
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  // Estados de parallax eliminados por no ser necesarios para la UI actual
   const [currentView, setCurrentView] = useState<"preview" | "topics">("preview");
   const [selectedTopic, setSelectedTopic] = useState<number | null>(null);
 
@@ -55,25 +54,16 @@ export default function HomePage() {
   const cardRef = useRef<HTMLElement | null>(null);
   const scrollVelocityRef = useRef(0);
   const lastScrollRef = useRef(0);
-  const rafRef = useRef<number | undefined>(undefined);
 
   useEffect(() => {
     const handleScroll = () => {
       const currentScroll = window.scrollY;
       scrollVelocityRef.current = currentScroll - lastScrollRef.current;
       lastScrollRef.current = currentScroll;
-      
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-      }
-      
-      rafRef.current = requestAnimationFrame(() => {
-        setScrollY(currentScroll);
-      });
     };
 
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePos({ x: e.clientX, y: e.clientY });
+    const handleMouseMove = () => {
+      
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -82,9 +72,6 @@ export default function HomePage() {
     return () => {
       window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('mousemove', handleMouseMove);
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-      }
     };
   }, []);
 
@@ -116,7 +103,7 @@ export default function HomePage() {
   
   function goToTopics() {
     setCurrentView("topics");
-    setSelectedTopic(1); // Seleccionar el primer tópico por defecto
+    setSelectedTopic(1); 
   }
   
   function goToPreview() {
@@ -124,19 +111,10 @@ export default function HomePage() {
     setSelectedTopic(null);
   }
 
-  // Parallax effect calculation
-  const parallaxLeft = Math.min(scrollY * 0.08, 150);
-  const parallaxRight = Math.min(scrollY * 0.08, 150);
   
-  // Efecto de velocidad de scroll
-  const scrollVelocity = scrollVelocityRef.current;
-  const velocityEffect = Math.max(-30, Math.min(30, scrollVelocity * 0.5));
   
-  // Mouse hover effect
-  const mouseInfluenceLeft = (mousePos.x / window.innerWidth - 0.5) * 20;
-  const mouseInfluenceRight = (mousePos.x / window.innerWidth - 0.5) * -20;
   
-  // Renderizar la vista previa del curso
+  
   const renderCoursePreview = () => {
     return (
       <div className="flex flex-col items-center justify-start min-h-screen bg-gradient-to-b from-orange-50 to-gray-50 p-0 pt-2">
@@ -242,7 +220,7 @@ export default function HomePage() {
     );
   };
   
-  // Renderizar la vista de tópicos del curso
+  
   const renderTopicsView = () => {
     const currentTopic = course.topics.find(t => t.id === selectedTopic) || course.topics[0];
     const isFirstTopic = selectedTopic === 1;
