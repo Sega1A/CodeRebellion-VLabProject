@@ -83,6 +83,13 @@ model Course {
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   enrollments Enrollment[]
+  status      CourseStatus @default(BORRADOR)
+}
+
+enum CourseStatus {
+  ACTIVO
+  INACTIVO
+  BORRADOR
 }
 
 model Enrollment {
