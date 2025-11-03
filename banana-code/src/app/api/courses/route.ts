@@ -11,6 +11,7 @@ export async function GET() {
     });
 
     // Mapear los cursos al formato esperado por el frontend
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const mappedCourses = courses.map((course: any) => ({
       id: course.id,
       title: course.name,
@@ -38,11 +39,13 @@ export async function POST(request: NextRequest) {
     const body = await request.json();
     const { title, description, content } = body;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const newCourse: any = await prisma.course.create({
       data: {
         name: title || 'Nuevo Curso',
         description: description || 'Descripción del curso',
         content: content || { topics: [] },
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any,
     });
 
