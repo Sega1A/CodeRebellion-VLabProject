@@ -7,6 +7,7 @@ export async function GET(
   { params }: { params: { id: string } }
 ) {
   try {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const course: any = await prisma.course.findUnique({
       where: {
         id: params.id,
@@ -49,8 +50,9 @@ export async function PUT(
 ) {
   try {
     const body = await request.json();
-    const { title, description, students, topics, progress, content } = body;
+    const { title, description, content } = body;
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const updatedCourse: any = await prisma.course.update({
       where: {
         id: params.id,
@@ -59,6 +61,7 @@ export async function PUT(
         name: title,
         description,
         content,
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
       } as any,
     });
 
