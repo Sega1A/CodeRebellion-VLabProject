@@ -84,6 +84,15 @@ export default function HomePage() {
     animateIn();
   }, []);
 
+  useEffect(() => {
+    const fetchDCourse = async () => {
+      const response = await fetch("/api/courses/status?status=ACTIVO");
+      const data = await response.json();
+      console.log(data);
+    }
+    fetchDCourse();
+  }, []);
+
   function startEdit() {
     setDraft(course);
     setEditing(true);
