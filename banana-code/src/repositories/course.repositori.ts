@@ -6,4 +6,9 @@ export const CourseRepository = {
     prisma.course.findMany({ where: { status } }),
   changeStatusById: (id: string, status: CourseStatus) =>
     prisma.course.update({ where: { id }, data: { status } }),
+  changeActiveCoursesIntoInactive: () =>
+    prisma.course.updateMany({
+      where: { status: CourseStatus.ACTIVO },
+      data: { status: CourseStatus.INACTIVO },
+    }),
 };

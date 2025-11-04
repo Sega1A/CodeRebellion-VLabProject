@@ -1,4 +1,4 @@
-import { PrismaClient, Course } from "@prisma/client";
+import { PrismaClient, Course, CourseStatus } from "@prisma/client";
 import { v4 as uuidv4 } from "uuid";
 
 const COURSES_DATA = [
@@ -9,6 +9,7 @@ const COURSES_DATA = [
     code: "P101",
     startDate: new Date("2025-08-15"),
     endDate: new Date("2025-12-26"),
+    status: CourseStatus.ACTIVO,
   },
   {
     name: "Introduccion a la programacion con Python. Gestion 1/2026",
@@ -17,6 +18,7 @@ const COURSES_DATA = [
     code: "P101",
     startDate: new Date("2026-02-10"),
     endDate: new Date("2026-06-05"),
+    status: CourseStatus.BORRADOR,
   },
 ];
 
@@ -39,6 +41,7 @@ export async function seedCourses(prisma: PrismaClient) {
         code: data.code,
         startDate: data.startDate,
         endDate: data.endDate,
+        status: data.status,
       },
     });
     createdCourses.push(course);

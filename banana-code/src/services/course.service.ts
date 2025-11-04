@@ -6,6 +6,9 @@ export const CourseService = {
     return await CourseRepository.getCoursesByStatus(status);
   },
   async changeStatusById(id: string, status: CourseStatus) {
+    if (status === CourseStatus.ACTIVO) {
+      await CourseRepository.changeActiveCoursesIntoInactive();
+    }
     return await CourseRepository.changeStatusById(id, status);
   },
 };
