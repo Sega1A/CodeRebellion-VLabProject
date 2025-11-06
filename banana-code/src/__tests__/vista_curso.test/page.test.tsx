@@ -44,14 +44,13 @@ beforeEach(() => {
 });
 
 describe("HomePage Component (vista_curso)", () => {
-  const defaultDesc =
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nisl ligula, pulvinar accumsan varius et, volutpat eget ipsum. Sed at libero vel turpis blandit sollicitudin vitae nec lectus.";
+  
 
   it("1. Renderiza como 'estudiante' (vista de tópicos)", () => {
     setTestRole("estudiante");
     render(<HomePage />);
 
-    // La vista por defecto muestra el tópico seleccionado
+    
     expect(
       screen.getByRole("heading", { name: /Variables y tipos de datos/i })
     ).toBeInTheDocument();
@@ -71,7 +70,7 @@ describe("HomePage Component (vista_curso)", () => {
       screen.getByRole("heading", { name: /Variables y tipos de datos/i })
     ).toBeInTheDocument();
 
-    // Sin controles de edición en esta vista
+    
     expect(screen.queryByRole("button", { name: /Editar/i })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Guardar/i })).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Cancelar/i })).not.toBeInTheDocument();
@@ -85,7 +84,7 @@ describe("HomePage Component (vista_curso)", () => {
       screen.getByRole("heading", { name: /Variables y tipos de datos/i })
     ).toBeInTheDocument();
 
-    // Sin controles de edición en esta vista
+    
     expect(screen.queryByRole("button", { name: /Editar/i })).not.toBeInTheDocument();
   });
 
