@@ -1,7 +1,7 @@
 import { PrismaClient } from "@prisma/client";
 import { createdUsers } from "./AccountSeeder";
 import { createdCourses } from "./CourseSeeder";
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "crypto";
 
 export async function seedEnrollments(prisma: PrismaClient) {
   console.log("Agregando inscripciones de estudiantes a Cursos");
@@ -31,7 +31,7 @@ export async function seedEnrollments(prisma: PrismaClient) {
       },
       update: {},
       create: {
-        id: uuidv4(),
+        id: randomUUID(),
         userId: data.userId,
         courseId: data.courseId,
       },
