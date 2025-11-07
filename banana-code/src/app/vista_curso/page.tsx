@@ -87,14 +87,7 @@ export default function HomePage() {
 
   
 
-  
-  
-  
-  
-
-  
-  
-  const renderTopicsView = () => {
+    const renderTopicsView = () => {
     const currentTopic = course.topics.find(t => t.id === selectedTopic) || course.topics[0];
     const isFirstTopic = selectedTopic === 1;
     
@@ -141,7 +134,7 @@ export default function HomePage() {
               </div>
               
               
-              <div className="w-full md:w-3/4 lg:w-4/5 border border-orange-200 rounded-lg p-3 bg-white shadow-sm h-5/6 flex flex-col">
+              <div className="w-full md:w-3/4 lg:w-4/5 border border-orange-200 rounded-lg p-3 bg-white shadow-sm h-[500px] flex flex-col">
                 <h2 className="text-lg font-medium mb-2 text-orange-700 text-center">{currentTopic.id}. {currentTopic.title}</h2>
                 <div className="prose max-w-none flex-1 text-sm overflow-y-auto">
                   <p className="text-gray-600 text-center mb-2">Contenido del tópico seleccionado</p>
