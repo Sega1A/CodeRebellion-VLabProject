@@ -1,5 +1,5 @@
 import { PrismaClient, Course } from "@prisma/client";
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "crypto";
 
 const COURSES_DATA = [
   {
@@ -33,7 +33,7 @@ export async function seedCourses(prisma: PrismaClient) {
       where: { code: data.code },
       update: {},
       create: {
-        id: uuidv4(),
+        id: randomUUID(),
         name: data.name,
         description: data.description,
         code: data.code,
