@@ -1,5 +1,5 @@
 import { PrismaClient, Role, User } from "@prisma/client";
-import { v4 as uuidv4 } from "uuid";
+import { randomUUID } from "crypto";
 import bcrypt from "bcrypt";
 
 const USERS_DATA = [
@@ -57,7 +57,7 @@ export async function seedAccounts(prisma: PrismaClient) {
         password: hashedPassword,
       },
       create: {
-        id: uuidv4(),
+        id: randomUUID(),
         email: data.email,
         name: data.name,
         role: data.role,
@@ -83,7 +83,7 @@ export async function seedAccounts(prisma: PrismaClient) {
           type: "oauth",
           provider: data.provider,
           providerAccountId: data.providerAccountId!,
-          access_token: "fake-access-token-" + uuidv4(),
+          access_token: "fake-access-token-" + randomUUID(),
         },
       });
       console.log(
