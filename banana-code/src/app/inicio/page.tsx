@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 
 const defaultCourse = {
@@ -17,6 +17,18 @@ const defaultCourse = {
 
 export default function InicioPage() {
   const course = defaultCourse;
+  // const [course, setCourse] = useState({});
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    const response = await fetch("/api/courses");
+    const data = await response.json();
+    console.log(data);
+  };
+
   return (
     <div className="h-screen bg-gradient-to-b from-orange-50 to-gray-50">
       <div className="w-full bg-white rounded-none shadow-sm overflow-hidden border-t-4 border-orange-500">
@@ -26,7 +38,9 @@ export default function InicioPage() {
           </div>
 
           <div className="bg-orange-50 rounded-lg p-3 mb-4 border-l-4 border-orange-400">
-            <h2 className="text-xl font-medium mb-2 text-orange-700">{course.title}</h2>
+            <h2 className="text-xl font-medium mb-2 text-orange-700">
+              {course.title}
+            </h2>
             <div className="mb-2">
               <p className="text-base text-gray-600 mb-1">Docente:</p>
               <p className="font-medium text-base">{course.instructor}</p>
@@ -38,7 +52,9 @@ export default function InicioPage() {
           </div>
 
           <div className="mb-4">
-            <h2 className="text-xl font-medium mb-2 text-orange-700">Contenido del curso</h2>
+            <h2 className="text-xl font-medium mb-2 text-orange-700">
+              Contenido del curso
+            </h2>
             <div className="space-y-2 w-full">
               {course.topics.map((topic) => (
                 <Link
