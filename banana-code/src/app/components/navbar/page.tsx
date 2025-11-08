@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect } from "react";
 import "./styles.css";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { getSession } from "next-auth/react";
+import { getSession, signOut } from "next-auth/react";
 import { UserInfo } from "./types/userInfo-type";
 import { SessionType } from "./types/session-type";
 import { Role } from "@prisma/client";
@@ -13,6 +13,7 @@ export default function Navbar() {
   const brandRef = useRef<HTMLDivElement | null>(null);
   const userRef = useRef<HTMLDivElement | null>(null);
   const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -20,14 +21,36 @@ export default function Navbar() {
   }, []);
 
   const getUserInfoBySession = async () => {
-    const session: SessionType | unknown = await getSession();
-    if (!session) return;
+    const session = await getSession() as SessionType | null;
+    if (!session || !session.user) return;
     setUserInfo(session.user);
   };
 
   const onLoggo = () => {
     router.push("/home");
   };
+
+  const handleLogout = async () => {
+    await signOut({ callbackUrl: "/" });
+  };
+
+  const toggleDropdown = () => {
+    setShowDropdown(!showDropdown);
+  };
+
+  // Cerrar dropdown al hacer clic fuera
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (userRef.current && !userRef.current.contains(event.target as Node)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   return (
     <div>
@@ -117,9 +140,18 @@ export default function Navbar() {
             )}
           </button>
 
-          <div ref={userRef} className="user">
-            {userInfo === null ? "******" : `${userInfo.name}`}
-            <span className="caret">▾</span>
+          <div ref={userRef} className="user-container">
+            <div className="user" onClick={toggleDropdown} style={{ cursor: "pointer" }}>
+              {userInfo === null ? "******" : `${userInfo.name}`}
+              <span className="caret">▾</span>
+            </div>
+            {showDropdown && (
+              <div className="dropdown-menu">
+                <button onClick={handleLogout} className="dropdown-item">
+                  Cerrar sesión
+                </button>
+              </div>
+            )}
           </div>
         </div>
       </header>
