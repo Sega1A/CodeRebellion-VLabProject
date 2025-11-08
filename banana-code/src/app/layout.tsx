@@ -2,6 +2,7 @@
 import { usePathname } from "next/navigation";
 import Navbar from "./components/navbar/page";
 import "./globals.css";
+import { ToastProvider } from "./components/Toast/providers/ToastProvider";
 
 export default function RootLayout({
   children,
@@ -9,7 +10,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const routesWithNavbar = ["/home", "/estudiante", "/admin", "/vista_curso","/vista_prof_editor"];
+  const routesWithNavbar = [
+    "/home",
+    "/estudiante",
+    "/admin",
+    "/vista_curso",
+    "/vista_prof_editor",
+  ];
   const showNavbar = routesWithNavbar.some((route) =>
     pathname.startsWith(route)
   );
@@ -17,8 +24,10 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        {showNavbar && <Navbar />}
-        <main>{children}</main>
+        <ToastProvider>
+          {showNavbar && <Navbar />}
+          <main>{children}</main>
+        </ToastProvider>
       </body>
     </html>
   );
