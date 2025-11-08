@@ -1,6 +1,6 @@
 import LayoutClient from "./components/LayoutClient";
+import Providers from "./components/Providers";
 import "./globals.css";
-import { ToastProvider } from "./components/Toast/providers/ToastProvider";
 
 export default function RootLayout({
   children,
@@ -11,7 +11,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
         <div suppressHydrationWarning>
-          <LayoutClient>{children}</LayoutClient>
+          <Providers>
+            <LayoutClient>{children}</LayoutClient>
+          </Providers>
         </div>
       </body>
     </html>
