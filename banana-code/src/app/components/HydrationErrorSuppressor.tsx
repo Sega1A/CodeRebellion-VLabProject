@@ -4,7 +4,6 @@ import { useEffect } from "react";
 
 export default function HydrationErrorSuppressor() {
   useEffect(() => {
-    // Suppress hydration warnings in development
     if (process.env.NODE_ENV === "development") {
       const originalError = console.error;
       console.error = (...args: any[]) => {
