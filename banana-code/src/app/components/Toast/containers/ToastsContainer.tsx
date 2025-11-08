@@ -14,7 +14,7 @@ export const ToastsContainer: React.FC<ToastsContainerProps> = ({
           <div
             key={toast.id}
             className={`
-              ${bg} text-white p-4 rounded-lg shadow-xl min-w-[320px] max-w-sm 
+              ${bg} text-gray-800 p-4 rounded-lg shadow-xl min-w-[320px] max-w-sm 
               transition-all duration-300 transform translate-x-0 opacity-100
               pointer-events-auto cursor-pointer
             `}
@@ -23,7 +23,7 @@ export const ToastsContainer: React.FC<ToastsContainerProps> = ({
             <div className="flex items-center">
               <p>{toast.message}</p>
               <button
-                className="ml-auto text-white/70 hover:text-white px-2"
+                className="ml-auto text-gray-800/70 hover:text-gray-950 px-2"
                 aria-label="Cerrar notificación"
                 onClick={(e) => {
                   e.stopPropagation();
