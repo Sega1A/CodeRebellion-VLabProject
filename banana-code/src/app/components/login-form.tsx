@@ -47,7 +47,7 @@ function LoginFormComponent() {
       });
       setIsSubmitting(false);
 
-      if (!response.ok) {
+      if (!response || !response.ok) {
         throw new Error("Error al autenticar al usuario");
       }
       router.push("/home");
@@ -60,7 +60,7 @@ function LoginFormComponent() {
 
   const handleOAuthLogin = async (provider: "google" | "azure-ad") => {
     setIsOAuthLoading(provider);
-    await signIn(provider);
+    await signIn(provider, { callbackUrl: "/home" });
     // Add code to handle errors or success responses.
     setIsOAuthLoading(null);
   };
