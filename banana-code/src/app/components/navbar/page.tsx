@@ -73,20 +73,53 @@ export default function Navbar() {
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 group-hover:w-full transition-all duration-300 ease-out"></span>
           </Link>
 
+          {/* Menú para todos los roles autenticados */}
           <Link
             href={"/vista_curso"}
             className="relative text-gray-700 font-bold hover:text-blue-600 transition-colors duration-300 group py-2 text-inherit"
           >
-            Curso
+            Cursos
             <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 group-hover:w-full transition-all duration-300 ease-out"></span>
           </Link>
 
+          {/* Menú solo para Administradores */}
           {userInfo?.role === Role.ADMINISTRADOR && (
+            <>
+              <Link
+                href={"/admin/users-list"}
+                className="relative text-gray-700 font-bold hover:text-blue-600 transition-colors duration-300 group py-2 text-inherit"
+              >
+                Usuarios
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 group-hover:w-full transition-all duration-300 ease-out"></span>
+              </Link>
+              <Link
+                href={"/admin/courses"}
+                className="relative text-gray-700 font-bold hover:text-blue-600 transition-colors duration-300 group py-2 text-inherit"
+              >
+                Gestión Cursos
+                <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 group-hover:w-full transition-all duration-300 ease-out"></span>
+              </Link>
+            </>
+          )}
+
+          {/* Menú para Profesor Editor */}
+          {userInfo?.role === Role.PROFESOR_EDITOR && (
             <Link
-              href={"/admin/users-list"}
+              href={"/editor-cursos"}
               className="relative text-gray-700 font-bold hover:text-blue-600 transition-colors duration-300 group py-2 text-inherit"
             >
-              Usuarios
+              Editor Curso
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 group-hover:w-full transition-all duration-300 ease-out"></span>
+            </Link>
+          )}
+
+          {/* Menú para Estudiante */}
+          {userInfo?.role === Role.ESTUDIANTE && (
+            <Link
+              href={"/estudiante/mis-cursos"}
+              className="relative text-gray-700 font-bold hover:text-blue-600 transition-colors duration-300 group py-2 text-inherit"
+            >
+              Mis Cursos
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-gradient-to-r from-blue-500 to-blue-600 group-hover:w-full transition-all duration-300 ease-out"></span>
             </Link>
           )}
@@ -147,7 +180,32 @@ export default function Navbar() {
             </div>
             {showDropdown && (
               <div className="dropdown-menu">
+                <div className="dropdown-user-info">
+                  <p className="dropdown-user-name">{userInfo?.name}</p>
+                  <p className="dropdown-user-role">
+                    {userInfo?.role === Role.ADMINISTRADOR && "Administrador"}
+                    {userInfo?.role === Role.PROFESOR_EDITOR && "Profesor Editor"}
+                    {userInfo?.role === Role.PROFESOR_EJECUTOR && "Profesor Ejecutor"}
+                    {userInfo?.role === Role.ESTUDIANTE && "Estudiante"}
+                  </p>
+                </div>
+                <div className="dropdown-divider"></div>
                 <button onClick={handleLogout} className="dropdown-item">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="16"
+                    height="16"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  >
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                    <polyline points="16 17 21 12 16 7"></polyline>
+                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                  </svg>
                   Cerrar sesión
                 </button>
               </div>
