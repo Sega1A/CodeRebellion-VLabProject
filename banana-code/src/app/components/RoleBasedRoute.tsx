@@ -27,6 +27,7 @@ export default function RoleBasedRoute({
       return;
     }
 
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const userRole = (session.user as any)?.role as Role | undefined;
 
     if (userRole && !allowedRoles.includes(userRole)) {
@@ -49,6 +50,7 @@ export default function RoleBasedRoute({
     return null;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const userRole = (session.user as any)?.role as Role | undefined;
 
   if (userRole && !allowedRoles.includes(userRole)) {
