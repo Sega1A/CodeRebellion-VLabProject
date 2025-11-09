@@ -10,7 +10,7 @@ export default function LayoutClient({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
-  const routesWithNavbar = ["/home", "/estudiante", "/admin", "/vista_curso", "/vista_prof_editor"];
+  const routesWithNavbar = ["/home", "/estudiante", "/admin", "/vista_curso", "/vista_prof_editor", "/editor-cursos"];
   const showNavbar = routesWithNavbar.some((route) =>
     pathname.startsWith(route)
   );
