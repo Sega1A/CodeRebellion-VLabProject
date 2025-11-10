@@ -31,6 +31,11 @@ export const authOptions: AuthOptions = {
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID as string,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+      authorization: {
+        params: {
+          prompt: "select_account",
+        },
+      },
     }),
     MicrosoftProvider({
       clientId: process.env.MICROSOFT_CLIENT_ID! as string,
@@ -62,8 +67,13 @@ export const authOptions: AuthOptions = {
       }
       return session;
     },
-    async redirect({ baseUrl }) {
-      return baseUrl;
+    async redirect({ url, baseUrl }) {
+      // If the url is a sign-in callback, redirect to /home
+      if (url.includes("/api/auth/signin") || url === baseUrl) {
+        return `${baseUrl}/home`;
+      }
+      // Otherwise, allow the redirect
+      return url.startsWith(baseUrl) ? url : baseUrl;
     },
     async signIn({ user }) {
       if (!user) return false;

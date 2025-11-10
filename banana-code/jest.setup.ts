@@ -44,4 +44,17 @@ if (typeof (globalThis as GlobalThisWithPolyfills).Response === "undefined") {
 	};
 }
 
+// Polyfill fetch for next-auth and other libraries that need it
+if (typeof global.fetch === "undefined") {
+	global.fetch = jest.fn(() =>
+		Promise.resolve({
+			ok: true,
+			status: 200,
+			json: async () => ({}),
+			text: async () => "",
+			headers: new Map(),
+		})
+	) as unknown as typeof fetch;
+}
+
 

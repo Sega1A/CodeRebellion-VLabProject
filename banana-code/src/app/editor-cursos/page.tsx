@@ -37,7 +37,7 @@ const CourseEditor = () => {
   const [selectedCourse, setSelectedCourse] = useState<Course | null>(null);
   const [saveStatus, setSaveStatus] = useState<'' | 'saving' | 'saved' | 'error'>('');
   const [courses, setCourses] = useState<Course[]>([]);
-  const [editorData, setEditorData] = useState<{ topics: Topic[] } | null>(null);
+  const [editorData, setEditorData] = useState<{ title: string; description: string; topics: Topic[] } | null>(null);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
@@ -65,7 +65,9 @@ const CourseEditor = () => {
     try {
       const updatedCourse = {
         ...selectedCourse,
-        content: editorData,
+        title: editorData.title,
+        description: editorData.description,
+        content: { topics: editorData.topics },
         lastUpdated: new Date().toISOString(),
         topics: editorData.topics.length,
       };
@@ -337,12 +339,23 @@ const CourseEditor = () => {
 
   const openEditor = (course: Course) => {
     setSelectedCourse(course);
-    setEditorData(course.content && course.content.topics ? course.content : { topics: [] });
+    setEditorData({
+      title: course.title,
+      description: course.description,
+      topics: course.content?.topics || []
+    });
     setView('editor');
   };
 
-  const updateCourseTitle = (newTitle: string) =>
+  const updateCourseTitle = (newTitle: string) => {
     setSelectedCourse((prev) => (prev ? { ...prev, title: newTitle } : prev));
+    setEditorData((prev) => (prev ? { ...prev, title: newTitle } : prev));
+  };
+
+  const updateCourseDescription = (newDescription: string) => {
+    setSelectedCourse((prev) => (prev ? { ...prev, description: newDescription } : prev));
+    setEditorData((prev) => (prev ? { ...prev, description: newDescription } : prev));
+  };
 
   if (view === 'editor') {
     return (
@@ -378,14 +391,14 @@ const CourseEditor = () => {
             )}
             <div
               className={
-                'fixed lg:sticky top-0 left-0 h-screen lg:h-auto w-72 lg:w-64 bg-gradient-to-br from-gray-800 to-gray-900 rounded-none lg:rounded-xl p-5 shadow-xl z-40 transform transition-transform duration-300 lg:top-24 ' +
+                'fixed lg:sticky top-0 left-0 h-screen lg:h-auto w-72 lg:w-64 bg-gradient-to-br from-orange-50 to-amber-50 border border-orange-200 rounded-none lg:rounded-xl p-5 shadow-xl z-40 transform transition-transform duration-300 lg:top-24 ' +
                 (isSidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0')
               }
             >
               <div className="flex items-center justify-between mb-6 lg:hidden">
-                <h2 className="text-white font-semibold">Menú</h2>
-                <button onClick={() => setIsSidebarOpen(false)} className="p-2 hover:bg-gray-700 rounded-lg">
-                  <X className="w-5 h-5 text-white" />
+                <h2 className="text-gray-800 font-semibold">Menú</h2>
+                <button onClick={() => setIsSidebarOpen(false)} className="p-2 hover:bg-orange-100 rounded-lg">
+                  <X className="w-5 h-5 text-gray-700" />
                 </button>
               </div>
               <button
@@ -399,18 +412,18 @@ const CourseEditor = () => {
                 {editorData?.topics &&
                   editorData.topics.map((topic, idx) => (
                     <div key={topic.id}>
-                      <div className="flex items-center gap-2 px-3 py-2.5 hover:bg-gray-800 rounded-lg group">
+                      <div className="flex items-center gap-2 px-3 py-2.5 hover:bg-orange-100 rounded-lg group transition-colors">
                         <button onClick={() => toggleTopic(topic.id)}>
                           {topic.isOpen ? (
-                            <ChevronDown className="w-4 h-4 text-gray-400" />
+                            <ChevronDown className="w-4 h-4 text-orange-600" />
                           ) : (
-                            <ChevronRight className="w-4 h-4 text-gray-400" />
+                            <ChevronRight className="w-4 h-4 text-orange-600" />
                           )}
                         </button>
-                        <span className="text-xs font-semibold text-orange-400 bg-orange-500/20 px-2 py-0.5 rounded">
+                        <span className="text-xs font-semibold text-orange-700 bg-orange-200 px-2 py-0.5 rounded">
                           #{idx + 1}
                         </span>
-                        <span className="text-sm font-medium text-gray-200 flex-1 truncate">
+                        <span className="text-sm font-medium text-gray-800 flex-1 truncate">
                           {topic.title}
                         </span>
                         <button
@@ -433,7 +446,7 @@ const CourseEditor = () => {
                             topic.contents.map((content) => (
                               <div
                                 key={content.id}
-                                className="flex items-center gap-2 px-3 py-1.5 hover:bg-gray-800 rounded-lg text-gray-400"
+                                className="flex items-center gap-2 px-3 py-1.5 hover:bg-orange-100 rounded-lg text-gray-600 transition-colors"
                               >
                                 {content.type === 'Text' ? (
                                   <FileText className="w-3.5 h-3.5" />
@@ -447,14 +460,14 @@ const CourseEditor = () => {
                             <div className="px-3 py-2 space-y-1.5">
                               <button
                                 onClick={() => addContentBlock(topic.id, 'Text')}
-                                className="flex items-center gap-2 text-xs text-gray-500 hover:text-gray-300 hover:bg-gray-800 w-full text-left px-2 py-1.5 rounded-lg"
+                                className="flex items-center gap-2 text-xs text-gray-600 hover:text-gray-800 hover:bg-orange-100 w-full text-left px-2 py-1.5 rounded-lg transition-colors"
                               >
                                 <FileText className="w-3.5 h-3.5" />
                                 Texto
                               </button>
                               <button
                                 onClick={() => addContentBlock(topic.id, 'Code')}
-                                className="flex items-center gap-2 text-xs text-gray-500 hover:text-gray-300 hover:bg-gray-800 w-full text-left px-2 py-1.5 rounded-lg"
+                                className="flex items-center gap-2 text-xs text-gray-600 hover:text-gray-800 hover:bg-orange-100 w-full text-left px-2 py-1.5 rounded-lg transition-colors"
                               >
                                 <Code className="w-3.5 h-3.5" />
                                 Código
@@ -469,6 +482,22 @@ const CourseEditor = () => {
             </div>
 
             <div className="flex-1 min-w-0 space-y-4 sm:space-y-6">
+              <div className="bg-white rounded-xl shadow-sm border border-orange-100 p-4 sm:p-6">
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-xs font-semibold text-gray-500 uppercase block mb-2">
+                      Descripción del Curso
+                    </label>
+                    <textarea
+                      value={editorData?.description || ''}
+                      onChange={(e) => updateCourseDescription(e.target.value)}
+                      className="w-full text-sm text-gray-800 border border-gray-300 focus:outline-none focus:ring-2 focus:ring-orange-400 focus:border-transparent rounded-lg px-4 py-3 resize-none"
+                      rows={3}
+                      placeholder="Escribe una descripción para tu curso..."
+                    />
+                  </div>
+                </div>
+              </div>
               {editorData?.topics &&
                 editorData.topics.map((topic, idx) => (
                   <div
