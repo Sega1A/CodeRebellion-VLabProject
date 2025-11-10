@@ -12,13 +12,20 @@ jest.mock('lucide-react', () => ({
   Menu: () => <div data-testid="menu-icon">Menu Icon</div>,
 }));
 
+// Mock next-auth
+jest.mock('next-auth/react', () => ({
+  getSession: jest.fn(() => Promise.resolve(null)),
+  signOut: jest.fn(),
+}));
+
 describe('EditorCurso Component', () => {
   describe('Modo Lista (no editing)', () => {
-    it('debería renderizar el título "Editor de Cursos" cuando no está en modo edición', () => {
+    it('debería renderizar los enlaces de navegación cuando no está en modo edición', () => {
       render(<EditorCurso />);
       
-      expect(screen.getByText('Editor de Cursos')).toBeInTheDocument();
-      expect(screen.getByText('Gestión Docente')).toBeInTheDocument();
+      expect(screen.getByText('Inicio')).toBeInTheDocument();
+      expect(screen.getByText('Cursos')).toBeInTheDocument();
+      expect(screen.getByText('Editor Curso')).toBeInTheDocument();
     });
 
     it('debería mostrar el emoji del plátano', () => {
@@ -27,27 +34,24 @@ describe('EditorCurso Component', () => {
       expect(screen.getByText('🍌')).toBeInTheDocument();
     });
 
-    it('debería mostrar el botón "Crear Curso" cuando se proporciona onCreateCourse', () => {
-      const mockCreateCourse = jest.fn();
-      render(<EditorCurso onCreateCourse={mockCreateCourse} />);
-      
-      expect(screen.getByText('Crear Curso')).toBeInTheDocument();
-    });
-
-    it('debería llamar a onCreateCourse cuando se hace click en el botón', () => {
-      const mockCreateCourse = jest.fn();
-      render(<EditorCurso onCreateCourse={mockCreateCourse} />);
-      
-      const button = screen.getByText('Crear Curso');
-      fireEvent.click(button);
-      
-      expect(mockCreateCourse).toHaveBeenCalledTimes(1);
-    });
-
-    it('NO debería mostrar el botón "Crear Curso" cuando no se proporciona onCreateCourse', () => {
+    it('debería mostrar el menú de usuario', () => {
       render(<EditorCurso />);
       
-      expect(screen.queryByText('Crear Curso')).not.toBeInTheDocument();
+      expect(screen.getByText('Usuario')).toBeInTheDocument();
+      expect(screen.getByText('▾')).toBeInTheDocument();
+    });
+
+    it('debería tener los enlaces de navegación con las clases correctas', () => {
+      render(<EditorCurso />);
+      
+      const inicioLink = screen.getByText('Inicio').closest('a');
+      expect(inicioLink).toHaveAttribute('href', '/home');
+      
+      const cursosLink = screen.getByText('Cursos').closest('a');
+      expect(cursosLink).toHaveAttribute('href', '/vista_curso');
+      
+      const editorLink = screen.getByText('Editor Curso').closest('a');
+      expect(editorLink).toHaveAttribute('href', '/editor-cursos');
     });
 
     it('debería tener la clase theme-light por defecto', () => {
