@@ -9,8 +9,6 @@ export default defineConfig({
   },
   migrations: {
     path: path.join("prisma", "migrations"),
-    
-    seed:
-      'ts-node --compiler-options {"module":"CommonJS","moduleResolution":"node"} prisma/seed.ts',
+    seed: 'ts-node --compiler-options {"module":"CommonJS","moduleResolution":"node"} prisma/seed.ts',
   },
 });
