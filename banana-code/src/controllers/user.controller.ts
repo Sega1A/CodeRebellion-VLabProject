@@ -16,11 +16,9 @@ export const UserController = {
   async changeUserRole(req: Request) {
     try {
       const { id, role } = await req.json();
-      console.log(id, role);
       if (!id || !role) {
         return NextResponse.json({ error: "Faltan datos" }, { status: 400 });
       }
-
       const updatedUser = await UserService.changeUserRole(id, role);
       return NextResponse.json(updatedUser);
     } catch (error: unknown) {
