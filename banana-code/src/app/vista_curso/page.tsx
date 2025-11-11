@@ -3,42 +3,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
-const defaultCourse = {
-  title: "Introducción a la programación",
-  description:
-    "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Donec nisl ligula, pulvinar accumsan varius et, volutpat eget ipsum. Sed at libero vel turpis blandit sollicitudin vitae nec lectus.",
-  instructor: "COSTAS JAUREGUI VLADIMIR ABEL",
-  topics: [
-    {
-      id: 1,
-      title: "Variables y tipos de datos",
-      content: "Declaración de variables, etc...",
-      subtopics: [
-        {
-          id: 101,
-          title: "Tipos de datos primitivos",
-          content: "contenido ... etc...",
-        },
-      ],
-    },
-    {
-      id: 2,
-      title: "Estructuras de control",
-      content: "Contenido sobre estructuras de control",
-    },
-    {
-      id: 3,
-      title: "Funciones y mod",
-      content: "Contenido sobre funciones",
-    },
-  ],
-};
-
 export default function HomePage() {
   const router = useRouter();
 
   const [theme] = useState<"dark" | "light">("light");
-  const [course] = useState(defaultCourse);
+  const [course, setCourse] = useState({});
+  const [loading, setLoading] = useState(true);
 
   const [selectedTopic, setSelectedTopic] = useState<number | null>(1);
   const searchParams = useSearchParams();
@@ -46,6 +16,22 @@ export default function HomePage() {
   const cardRef = useRef<HTMLElement | null>(null);
   const scrollVelocityRef = useRef(0);
   const lastScrollRef = useRef(0);
+
+  useEffect(() => {
+    const fetchCourseDetails = async () => {
+      try {
+        const response = await fetch("/api/courses/status?status=ACTIVO");
+        const courseData = await response.json();
+        setCourse(courseData[0]);
+        setLoading(false);
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Error al obtener los datos";
+        console.error(message);
+      }
+    };
+    fetchCourseDetails();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -83,14 +69,23 @@ export default function HomePage() {
   }, []);
 
   const renderTopicsView = () => {
+    if (!course || !course.content || !course.content.topics) {
+      return null;
+    }
     const currentTopic =
-      course.topics.find((t) => t.id === selectedTopic) || course.topics[0];
-    const isFirstTopic = selectedTopic === 1;
+      course.content.topics.find((t) => t.id === selectedTopic) ||
+      course.content.topics[0];
+
+    const currentTopicIndex = course.content.topics.findIndex(
+      (t) => t.id === currentTopic.id
+    );
+
+    const isFirstTopic = currentTopicIndex === 0;
+    const isLastTopic = currentTopicIndex === course.content.topics.length - 1;
 
     return (
       <div className="flex flex-col items-start justify-start h-screen bg-gradient-to-b from-orange-50 to-gray-50 p-0">
         <div className="w-full h-full bg-white shadow-none border-t-4 border-orange-500 mx-0 flex flex-col rounded-none">
-          {/* Área scrollable */}
           <div className="p-3 md:p-4 flex-1 overflow-y-auto">
             <div className="flex items-center justify-between mb-2">
               <button
@@ -117,7 +112,7 @@ export default function HomePage() {
               <div className="w-full md:w-1/4 lg:w-1/5">
                 <h2 className="text-lg font-medium mb-2">Tópicos del curso</h2>
                 <div className="space-y-1">
-                  {course.topics.map((topic) => (
+                  {course.content.topics.map((topic, index) => (
                     <button
                       key={topic.id}
                       onClick={() => setSelectedTopic(topic.id)}
@@ -128,7 +123,7 @@ export default function HomePage() {
                       }`}
                     >
                       <p className="font-medium truncate">
-                        {topic.id}. {topic.title}
+                        {index + 1}. {topic.title}
                       </p>
                     </button>
                   ))}
@@ -137,7 +132,7 @@ export default function HomePage() {
 
               <div className="w-full md:w-3/4 lg:w-4/5 border border-orange-200 rounded-lg p-3 bg-white shadow-sm h-[500px] flex flex-col">
                 <h2 className="text-lg font-medium mb-2 text-orange-700 text-center">
-                  {currentTopic.id}. {currentTopic.title}
+                  {currentTopic.title}
                 </h2>
                 <div className="prose max-w-none flex-1 text-sm overflow-y-auto">
                   <p className="text-gray-600 text-center mb-2">
@@ -167,8 +162,10 @@ export default function HomePage() {
                     className="border border-orange-300 text-orange-700 px-4 py-1.5 rounded-md hover:bg-orange-50 transition-colors text-sm"
                     disabled={isFirstTopic}
                     onClick={() => {
-                      if (selectedTopic && selectedTopic > 1) {
-                        setSelectedTopic(selectedTopic - 1);
+                      if (currentTopicIndex > 0) {
+                        const previousTopic =
+                          course.content.topics[currentTopicIndex - 1];
+                        setSelectedTopic(previousTopic.id);
                       }
                     }}
                   >
@@ -176,13 +173,15 @@ export default function HomePage() {
                   </button>
                   <button
                     className="bg-orange-500 text-white px-4 py-1.5 rounded-md hover:bg-orange-600 shadow-sm transition-colors text-sm"
-                    disabled={selectedTopic === course.topics.length}
+                    disabled={isLastTopic}
                     onClick={() => {
                       if (
-                        selectedTopic &&
-                        selectedTopic < course.topics.length
+                        currentTopicIndex <
+                        course.content.topics.length - 1
                       ) {
-                        setSelectedTopic(selectedTopic + 1);
+                        const nextTopic =
+                          course.content.topics[currentTopicIndex + 1];
+                        setSelectedTopic(nextTopic.id);
                       }
                     }}
                   >
@@ -193,7 +192,7 @@ export default function HomePage() {
             </div>
           </div>
 
-          <div className="fixed bottom-4 left-0 right-0 z-40 px-4">
+          {/* <div className="fixed bottom-4 left-0 right-0 z-40 px-4">
             <div
               className="max-w-6xl mx-auto border rounded-md px-4 py-2 shadow-sm backdrop-blur
               bg-white/70 border-gray-200 text-gray-800
@@ -204,7 +203,7 @@ export default function HomePage() {
                 <div className="font-medium text-green-600">Activo</div>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     );
@@ -216,7 +215,16 @@ export default function HomePage() {
         theme === "dark" ? "bg-gray-900 text-white" : "bg-white text-gray-900"
       }`}
     >
-      {renderTopicsView()}
+      {loading ? (
+        <div className="flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900"></div>
+            <p className="mt-4 text-gray-600">Cargando...</p>
+          </div>
+        </div>
+      ) : (
+        renderTopicsView()
+      )}
     </div>
   );
 }
