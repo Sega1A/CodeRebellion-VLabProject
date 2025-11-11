@@ -23,4 +23,7 @@ export const UserService = {
 
     return await UserRepository.changeRole(id, role);
   },
+  async findUserById(id: string) {
+    return await UserRepository.findById(id);
+  },
 };

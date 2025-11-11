@@ -1,5 +1,5 @@
 import { prisma } from "@/lib/prisma";
-import { CourseStatus } from "@prisma/client";
+import { CourseStatus, Role } from "@prisma/client";
 
 export const CourseRepository = {
   getCoursesByStatus: (status: CourseStatus) =>
@@ -10,5 +10,25 @@ export const CourseRepository = {
     prisma.course.updateMany({
       where: { status: CourseStatus.ACTIVO },
       data: { status: CourseStatus.INACTIVO },
+    }),
+  insertTeacherToCourse: (idCourse: string, idTeacher: string, role: Role) =>
+    prisma.courseTeacher.create({
+      data: { courseId: idCourse, userId: idTeacher, role: role },
+    }),
+  teachersByCourseId: (idCourse: string) =>
+    prisma.courseTeacher.findMany({
+      where: { courseId: idCourse },
+      select: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+            image: true,
+            role: true,
+            phone: true,
+          },
+        },
+      },
     }),
 };
