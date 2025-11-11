@@ -22,6 +22,9 @@ model User {
   enrollments    Enrollment[]
   createdAt      DateTime      @default(now())
   updatedAt      DateTime      @updatedAt
+  courseTeachers CourseTeacher[]
+
+  @@index([role])
 }
 
 enum Role {
@@ -71,12 +74,26 @@ model Course {
   id          String       @id @default(cuid())
   name        String
   description String?
-  code        String       @unique
+  code        String?      @unique
+  title       String       @default("Nuevo Curso")
+  students    Int          @default(0)
+  topics      Int          @default(0)
+  progress    Int          @default(0)
+  content     Json         @default("{\"topics\":[]}")
+  lastUpdated DateTime     @default(now()) @updatedAt
   startDate   DateTime?
   endDate     DateTime?
   createdAt   DateTime     @default(now())
   updatedAt   DateTime     @updatedAt
   enrollments Enrollment[]
+  status      CourseStatus @default(BORRADOR)
+  teachers CourseTeacher[]
+}
+
+enum CourseStatus {
+  ACTIVO
+  INACTIVO
+  BORRADOR
 }
 
 model Enrollment {
@@ -90,4 +107,23 @@ model Enrollment {
   updatedAt  DateTime @updatedAt
 
   @@unique([userId, courseId])
+  @@index([userId])
+  @@index([courseId])
+}
+
+model CourseTeacher {
+  id        String @id @default(cuid())
+  userId    String
+  courseId  String
+  role      Role
+  
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  course    Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, courseId]) // only one role per user
+  @@index([userId])
+  @@index([courseId])
 }
