@@ -127,3 +127,11 @@ model CourseTeacher {
   @@index([userId])
   @@index([courseId])
 }
+
+model TopicsLogs {
+  id          String        @id @default(cuid())
+  course      Course        @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  content     Json          @default("{\"topics\":[]}")
+  createdAt DateTime @default(now())
+}
+
