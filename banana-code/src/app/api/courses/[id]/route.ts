@@ -1,12 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 
-type RouteParams = { params: { id: string } };
-
 // GET /api/courses/[id] - Obtener un curso por ID
 export async function GET(
   request: NextRequest,
-  { params }: RouteParams
+  { params }: { params: { id: string } } 
 ) {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,7 +46,7 @@ export async function GET(
 // PUT /api/courses/[id] - Actualizar un curso
 export async function PUT(
   request: NextRequest,
-  { params }: RouteParams
+  { params }: { params: { id: string } }
 ) {
   try {
     const body = await request.json();
@@ -92,7 +90,7 @@ export async function PUT(
 // DELETE /api/courses/[id] - Eliminar un curso
 export async function DELETE(
   request: NextRequest,
-  { params }: RouteParams
+  { params }: { params: { id: string } } 
 ) {
   try {
     await prisma.course.delete({
