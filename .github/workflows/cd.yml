@@ -26,9 +26,8 @@ jobs:
         run: gcloud auth configure-docker --quiet
       - name: Build Docker Image
         run: |
-          # La imagen se etiqueta con el ID del proyecto, el nombre del servicio y el hash del commit.
           IMAGE_TAG=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
-          docker build -t ${IMAGE_TAG} .
+          docker build -t ${IMAGE_TAG} -f banana-code/Dockerfile ./banana-code
       - name: Push Docker Image
         run: |
           IMAGE_TAG=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
