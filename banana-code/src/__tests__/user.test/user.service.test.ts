@@ -7,6 +7,20 @@ type Role =
   | "PROFESOR_EJECUTOR"
   | "PROFESOR_EDITOR";
 
+interface UserMock {
+  id: string;
+  name: string | null;
+  email: string | null;
+  password: string | null;
+  emailVerified: Date | null;
+  image: string | null;
+  role: Role;
+  createdAt: Date;
+  updatedAt: Date;
+  phone: string | null;
+  studentCode: string | null;
+}
+
 jest.mock("@/repositories/user.repository");
 
 describe("UserService", () => {
@@ -60,7 +74,9 @@ describe("UserService", () => {
       role: "ADMINISTRADOR",
       createdAt: new Date(),
       updatedAt: new Date(),
-    });
+      phone: null,
+      studentCode: null,
+    } as UserMock);
 
     await expect(
       UserService.changeUserRole("1", "PROFESOR_EJECUTOR")
@@ -68,17 +84,7 @@ describe("UserService", () => {
   });
 
   test("changeUserRole cambia el rol correctamente", async () => {
-    const user: {
-      id: string;
-      name: string | null;
-      email: string | null;
-      password: string | null;
-      emailVerified: Date | null;
-      image: string | null;
-      role: Role;
-      createdAt: Date;
-      updatedAt: Date;
-    } = {
+    const user: UserMock = {
       id: "2",
       name: null,
       email: "user@test.com",
@@ -88,8 +94,10 @@ describe("UserService", () => {
       role: "ESTUDIANTE",
       createdAt: new Date(),
       updatedAt: new Date(),
+      phone: null,
+      studentCode: null,
     };
-    const updatedUser: typeof user = { ...user, role: "PROFESOR_EJECUTOR" };
+    const updatedUser: UserMock = { ...user, role: "PROFESOR_EJECUTOR" };
 
     mockFindById.mockResolvedValueOnce(user);
     mockChangeRole.mockResolvedValueOnce(updatedUser);

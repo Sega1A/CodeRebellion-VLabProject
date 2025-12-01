@@ -44,7 +44,6 @@ export const authOptions: AuthOptions = {
     }),
   ],
   session: { strategy: "jwt" },
-  // pages: { signIn: "/login" },
   callbacks: {
     async jwt({ token, user }) {
       if (user) {
@@ -53,26 +52,26 @@ export const authOptions: AuthOptions = {
           select: { id: true, role: true, name: true },
         });
 
-        token.id = dbUser?.id;
-        token.role = dbUser?.role;
-        token.name = dbUser?.name;
+        if (dbUser) {
+          token.id = dbUser.id!;
+          token.role = dbUser.role;
+          token.name = dbUser.name;
+        }
       }
       return token;
     },
     async session({ session, token }) {
       if (token && session.user) {
-        session.user.id = token.id as string;
-        session.user.role = token.role as string;
-        session.user.name = token.name as string;
+        session.user.id = token.id;
+        session.user.role = token.role;
+        session.user.name = token.name;
       }
       return session;
     },
     async redirect({ url, baseUrl }) {
-      // If the url is a sign-in callback, redirect to /home
       if (url.includes("/api/auth/signin") || url === baseUrl) {
         return `${baseUrl}/home`;
       }
-      // Otherwise, allow the redirect
       return url.startsWith(baseUrl) ? url : baseUrl;
     },
     async signIn({ user }) {
@@ -81,7 +80,6 @@ export const authOptions: AuthOptions = {
         where: { id: user.id },
         select: { role: true },
       });
-      // Handle redirection to an specific page per user role in Login form, becouse here it's a chaos xd
       return true;
     },
   },

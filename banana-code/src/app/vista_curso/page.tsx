@@ -3,11 +3,33 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
+type SubTopic = {
+  id: number;
+  title: string;
+  content: string | null;
+};
+
+type Topic = {
+  id: number;
+  title: string;
+  content: string | null;
+  subtopics: SubTopic[];
+};
+
+type CourseType = {
+  id: string;
+  title: string;
+  description: string;
+  content: {
+    topics: Topic[];
+  };
+};
+
 export default function HomePage() {
   const router = useRouter();
 
   const [theme] = useState<"dark" | "light">("light");
-  const [course, setCourse] = useState({});
+  const [course, setCourse] = useState<CourseType | null>(null);
   const [loading, setLoading] = useState(true);
 
   const [selectedTopic, setSelectedTopic] = useState<number | null>(1);
@@ -21,13 +43,14 @@ export default function HomePage() {
     const fetchCourseDetails = async () => {
       try {
         const response = await fetch("/api/courses/status?status=ACTIVO");
-        const courseData = await response.json();
-        setCourse(courseData[0]);
+        const courseData = (await response.json()) as CourseType[];
+        setCourse(courseData[0] || null);
         setLoading(false);
       } catch (error) {
         const message =
           error instanceof Error ? error.message : "Error al obtener los datos";
         console.error(message);
+        setLoading(false);
       }
     };
     fetchCourseDetails();
@@ -69,9 +92,15 @@ export default function HomePage() {
   }, []);
 
   const renderTopicsView = () => {
-    if (!course || !course.content || !course.content.topics) {
+    if (
+      !course ||
+      !course.content ||
+      !course.content.topics ||
+      course.content.topics.length === 0
+    ) {
       return null;
     }
+
     const currentTopic =
       course.content.topics.find((t) => t.id === selectedTopic) ||
       course.content.topics[0];
@@ -191,19 +220,6 @@ export default function HomePage() {
               </div>
             </div>
           </div>
-
-          {/* <div className="fixed bottom-4 left-0 right-0 z-40 px-4">
-            <div
-              className="max-w-6xl mx-auto border rounded-md px-4 py-2 shadow-sm backdrop-blur
-              bg-white/70 border-gray-200 text-gray-800
-              dark:bg-gray-800/70 dark:border-gray-700 dark:text-gray-100"
-            >
-              <div className="flex items-center justify-between text-sm">
-                <div>Estado del curso:</div>
-                <div className="font-medium text-green-600">Activo</div>
-              </div>
-            </div>
-          </div> */}
         </div>
       </div>
     );
