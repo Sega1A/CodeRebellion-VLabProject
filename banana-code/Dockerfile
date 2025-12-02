@@ -2,6 +2,8 @@ FROM node:20-alpine AS builder
 WORKDIR /app
 COPY banana-code/package.json banana-code/package-lock.json ./ 
 COPY banana-code/prisma/schema.prisma ./prisma/
+ARG DATABASE_URL
+ENV DATABASE_URL=$DATABASE_URL
 
 RUN npm install
 COPY banana-code/. .
