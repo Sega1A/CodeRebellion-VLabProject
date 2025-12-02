@@ -1,13 +1,13 @@
 FROM node:20-alpine AS builder
 WORKDIR /app
-COPY package.json package-lock.json ./ 
-COPY prisma/schema.prisma ./prisma/
+COPY banana-code/package.json banana-code/package-lock.json ./ 
+COPY banana-code/prisma/schema.prisma ./prisma/
 
 ARG DATABASE_URL
 ENV DATABASE_URL=$DATABASE_URL
 
 RUN npm install
-COPY . .
+COPY banana-code/. .
 RUN npx prisma generate
 RUN npm run build
 
@@ -18,7 +18,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 WORKDIR /app
 
 COPY --from=builder /app/.next/standalone ./
-COPY --from=builder /app/public ./public
+COPY public ./public
 
 EXPOSE 8080
 CMD ["node", "server.js"]
