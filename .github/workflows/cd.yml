@@ -46,7 +46,7 @@ jobs:
           set_env_vars: |
             DATABASE_URL=postgresql://${{ secrets.DB_USER_PROD }}:${{ secrets.DB_PASS_PROD }}@/bananacode?schema=public&host=/cloudsql/${{ env.CLOUD_SQL_INSTANCE }},
             NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET_PROD }},
-            NEXTAUTH_URL=https://${{ env.SERVICE_NAME }}-${{ secrets.GCP_PROJECT_ID }}.run.app,
+            NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL_PROD }},
             GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID_PROD }},
             GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET_PROD }},
             MICROSOFT_CLIENT_ID=${{ secrets.MICROSOFT_CLIENT_ID_PROD }},
