@@ -44,6 +44,5 @@ jobs:
           image: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           flags: |
-            --quiet
             --set-cloudsql-instances=clever-oasis-479222-s1:us-central1:deploy-db
-            --set-env-vars='DATABASE_URL=postgresql://${{ secrets.DB_USER_PROD }}:${{ secrets.DB_PASS_PROD }}@/bananacode?schema=public&host=/cloudsql/clever-oasis-479222-s1:us-central1:deploy-db'
+            --set-env-vars=DATABASE_URL=postgresql://${{ secrets.DB_USER_PROD }}:${{ secrets.DB_PASS_PROD }}@/bananacode?schema=public&host=/cloudsql/clever-oasis-479222-s1:us-central1:deploy-db
