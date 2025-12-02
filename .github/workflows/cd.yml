@@ -2,32 +2,40 @@ name: CD
 
 on:
   push:
-    branches: [ "main", "deploy-test" ] 
+    branches: ["main", "deploy-test"]
 
 jobs:
   deploy:
     runs-on: ubuntu-latest
     env:
       SERVICE_NAME: banana-code-service
-      REGION: us-central1              
-      
+      REGION: us-central1
+
     permissions:
-      contents: 'read'
-      id-token: 'write'
+      contents: "read"
+      id-token: "write"
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-      - id: 'auth'
-        uses: 'google-github-actions/auth@v2'
+      - id: "auth"
+        uses: "google-github-actions/auth@v2"
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
       - name: Configure Docker
         run: gcloud auth configure-docker --quiet
       - name: Build Docker Image
+        env:
+          DB_URL_BUILD: postgresql://${{ secrets.DB_USER_PROD }}:${{ secrets.DB_PASS_PROD }}@/bananacode?schema=public&host=/cloudsql/clever-oasis-479222-s1:us-central1:deploy-db
         run: |
           IMAGE_TAG=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
-          docker build -t ${IMAGE_TAG} -f banana-code/Dockerfile ./banana-code
+          # 2. Pasamos la DATABASE_URL como build-arg al Dockerfile
+          # 3. Simplificamos el comando de build, ya que el Dockerfile está en la raíz
+          docker build \
+            --build-arg DATABASE_URL=$DB_URL_BUILD \
+            -t ${IMAGE_TAG} \
+            -f Dockerfile \
+            . # <--- Usamos el contexto raíz de la carpeta 'banana-code' (donde estás parado)
       - name: Push Docker Image
         run: |
           IMAGE_TAG=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
