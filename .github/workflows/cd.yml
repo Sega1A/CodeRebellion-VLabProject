@@ -10,7 +10,7 @@ jobs:
     env:
       SERVICE_NAME: banana-code-service
       REGION: us-central1
-
+      CLOUD_SQL_INSTANCE: clever-oasis-479222-s1:us-central1:deploy-db
     permissions:
       contents: "read"
       id-token: "write"
@@ -23,12 +23,11 @@ jobs:
         with:
           credentials_json: ${{ secrets.GCP_CREDENTIALS }}
       - name: Configure Docker
-        run: gcloud auth configure-docker --quiet
+        run: gcloud auth configure-docker --quiet gcr.io
       - name: Build Docker Image
         run: |
           IMAGE_TAG=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
           docker build \
-            --build-arg DATABASE_URL="postgresql://user:password@localhost:5432/dummy" \
             -t ${IMAGE_TAG} \
             -f banana-code/Dockerfile \
             .
@@ -43,6 +42,5 @@ jobs:
           region: ${{ env.REGION }}
           image: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
-          flags: |
-            --set-cloudsql-instances=clever-oasis-479222-s1:us-central1:deploy-db
-            --set-env-vars=DATABASE_URL=postgresql://${{ secrets.DB_USER_PROD }}:${{ secrets.DB_PASS_PROD }}@/bananacode?schema=public&host=/cloudsql/clever-oasis-479222-s1:us-central1:deploy-db
+          set_cloudsql_instances: ${{ env.CLOUD_SQL_INSTANCE }}
+          set_env_vars: DATABASE_URL=postgresql://${{ secrets.DB_USER_PROD }}:${{ secrets.DB_PASS_PROD }}@/bananacode?schema=public&host=/cloudsql/${{ env.CLOUD_SQL_INSTANCE }}
