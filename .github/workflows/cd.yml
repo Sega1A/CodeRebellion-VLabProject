@@ -32,7 +32,8 @@ jobs:
           docker build \
             --build-arg DATABASE_URL=$DB_URL_BUILD \
             -t ${IMAGE_TAG} \
-            -f **banana-code/Dockerfile** \
+            -f banana-code/Dockerfile \
+            ./banana-code
       - name: Push Docker Image
         run: |
           IMAGE_TAG=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
