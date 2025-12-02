@@ -18,7 +18,7 @@ ENV NEXT_TELEMETRY_DISABLED 1
 WORKDIR /app
 
 COPY --from=builder /app/.next/standalone ./
-COPY public ./public
+COPY banana-code/public ./public
 
 EXPOSE 8080
 CMD ["node", "server.js"]
