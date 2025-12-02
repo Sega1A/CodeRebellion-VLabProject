@@ -1,11 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { Course } from "@prisma/client";
-
 interface RouteContext {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
 interface CourseContent {
@@ -37,9 +36,9 @@ type CourseWithMetrics = Course & {
 
 export async function GET(
   request: NextRequest,
-  context: RouteContext
+  { params }: RouteContext
 ): Promise<NextResponse<CourseResponse | { error: string }>> {
-  const { id } = context.params;
+  const { id } = await params;
   try {
     const course = await prisma.course.findUnique({
       where: {
@@ -79,9 +78,9 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  context: RouteContext
+  { params }: RouteContext
 ): Promise<NextResponse<CourseResponse | { error: string }>> {
-  const { id } = context.params;
+  const { id } = await params;
   try {
     const body = await request.json();
     const { title, description, content } = body;
@@ -120,9 +119,9 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  context: RouteContext
+  { params }: RouteContext
 ): Promise<NextResponse<{ message: string } | { error: string }>> {
-  const { id } = context.params;
+  const { id } = await params;
   try {
     await prisma.course.delete({
       where: {
