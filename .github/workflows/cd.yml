@@ -29,13 +29,10 @@ jobs:
           DB_URL_BUILD: postgresql://${{ secrets.DB_USER_PROD }}:${{ secrets.DB_PASS_PROD }}@/bananacode?schema=public&host=/cloudsql/clever-oasis-479222-s1:us-central1:deploy-db
         run: |
           IMAGE_TAG=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
-          # 2. Pasamos la DATABASE_URL como build-arg al Dockerfile
-          # 3. Simplificamos el comando de build, ya que el Dockerfile está en la raíz
           docker build \
             --build-arg DATABASE_URL=$DB_URL_BUILD \
             -t ${IMAGE_TAG} \
-            -f Dockerfile \
-            . # <--- Usamos el contexto raíz de la carpeta 'banana-code' (donde estás parado)
+            -f **banana-code/Dockerfile** \
       - name: Push Docker Image
         run: |
           IMAGE_TAG=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
