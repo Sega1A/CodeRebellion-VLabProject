@@ -42,7 +42,7 @@ jobs:
           region: ${{ env.REGION }}
           image: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
           project_id: ${{ secrets.GCP_PROJECT_ID }}
-          cloudsql_instances: ${{ env.CLOUD_SQL_INSTANCE }}
+          flags: "--add-cloudsql-instances=${{ env.CLOUD_SQL_INSTANCE }}"
           env_vars: |
             DATABASE_URL=postgresql://${{ secrets.DB_USER_PROD }}:${{ secrets.DB_PASS_PROD }}@localhost/bananacode?host=/cloudsql/${{ env.CLOUD_SQL_INSTANCE }}
             NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET_PROD }}
