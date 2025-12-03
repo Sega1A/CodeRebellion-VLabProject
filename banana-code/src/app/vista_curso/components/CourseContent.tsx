@@ -3,17 +3,19 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
-type SubTopic = {
-  id: number;
-  title: string;
-  content: string | null;
+type TopicContentItem = {
+  id: string;
+  type: string;
+  content: string;
 };
 
 type Topic = {
   id: number;
   title: string;
-  content: string | null;
-  subtopics: SubTopic[];
+  description: string;
+  isOpen: boolean;
+  isPublished: boolean;
+  contents: TopicContentItem[];
 };
 
 type CourseType = {
@@ -47,9 +49,6 @@ export default function CourseContent() {
         setCourse(courseData[0] || null);
         setLoading(false);
       } catch (error) {
-        const message =
-          error instanceof Error ? error.message : "Error al obtener los datos";
-        console.error(message);
         setLoading(false);
       }
     };
@@ -164,26 +163,31 @@ export default function CourseContent() {
                   {currentTopic.title}
                 </h2>
                 <div className="prose max-w-none flex-1 text-sm overflow-y-auto">
-                  <p className="text-gray-600 text-center mb-2">
-                    Contenido del tópico seleccionado
-                  </p>
-                  <p className="text-center">{currentTopic.content}</p>
+                  {currentTopic.description && (
+                    <div className="mb-4">
+                      <p className="text-gray-600 italic text-center">
+                        {currentTopic.description}
+                      </p>
+                    </div>
+                  )}
 
-                  {currentTopic.subtopics &&
-                    currentTopic.subtopics.length > 0 && (
-                      <div className="mt-3">
-                        <ul className="list-disc pl-5 space-y-1">
-                          {currentTopic.subtopics.map((subtopic) => (
-                            <li key={subtopic.id}>
-                              <h3 className="font-medium text-orange-600 text-base">
-                                {subtopic.title}
-                              </h3>
-                              <p>{subtopic.content}</p>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
+                  {currentTopic.contents && currentTopic.contents.length > 0 ? (
+                    <div className="space-y-4">
+                      {currentTopic.contents.map((item) => (
+                        <div key={item.id}>
+                          {item.type === "Text" && (
+                            <div className="bg-gray-50 p-3 rounded border border-gray-100">
+                              <p className="text-gray-800">{item.content}</p>
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-center text-gray-400 mt-10">
+                      Este tópico aún no tiene contenido detallado.
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex justify-between mt-3 sticky bottom-0 bg-white/80 backdrop-blur-sm pt-2 border-t border-orange-100">
