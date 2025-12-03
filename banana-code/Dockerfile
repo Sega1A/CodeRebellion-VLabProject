@@ -18,7 +18,8 @@ WORKDIR /app
 
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next/standalone ./
-COPY banana-code/public ./public
+COPY --from=builder /app/.next/static ./.next/static
+COPY banana-code/public ./public 
 ENV PORT 8080
 
 EXPOSE 8080
