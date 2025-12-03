@@ -1,16 +1,16 @@
 import { PrismaClient } from "@prisma/client";
-// import { seedAccounts } from "./seeders/AccountSeeder";
-// import { seedCourses } from "./seeders/CourseSeeder";
-// import { seedEnrollments } from "./seeders/EnrollmentSeeder";
+import { seedAccounts } from "./seeders/AccountSeeder";
+import { seedCourses } from "./seeders/CourseSeeder";
+import { seedEnrollments } from "./seeders/EnrollmentSeeder";
 
 const prisma = new PrismaClient();
 
 async function main() {
-  // console.log(`Iniciando la siembra de datos...`);
-  // await seedAccounts(prisma);
-  // await seedCourses(prisma);
-  // await seedEnrollments(prisma);
-  // console.log(`Siembra de datos finalizada.`);
+  console.log(`Iniciando la siembra de datos...`);
+  await seedAccounts(prisma);
+  await seedCourses(prisma);
+  await seedEnrollments(prisma);
+  console.log(`Siembra de datos finalizada.`);
 }
 
 main()
