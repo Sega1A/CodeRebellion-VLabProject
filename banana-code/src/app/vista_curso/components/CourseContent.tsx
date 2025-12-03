@@ -180,6 +180,19 @@ export default function CourseContent() {
                               <p className="text-gray-800">{item.content}</p>
                             </div>
                           )}
+
+                          {item.type === "Code" && (
+                            <div className="bg-gray-800 p-4 rounded-lg border border-gray-700 overflow-x-auto shadow-sm my-3">
+                              <div className="flex items-center justify-between mb-2 border-b border-gray-700 pb-2">
+                                <span className="text-xs text-gray-400 font-mono">
+                                  Código
+                                </span>
+                              </div>
+                              <pre className="font-mono text-sm text-green-400 whitespace-pre">
+                                {item.content}
+                              </pre>
+                            </div>
+                          )}
                         </div>
                       ))}
                     </div>
