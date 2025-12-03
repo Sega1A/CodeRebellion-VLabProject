@@ -44,16 +44,16 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           cloudsql_instances: ${{ env.CLOUD_SQL_INSTANCE }}
           env_vars: |
-            postgresql://${{ secrets.DB_USER_PROD }}:${{ secrets.DB_PASS_PROD }}@localhost/bananacode?host=/cloudsql/clever-oasis-479222-s1:us-central1:deploy-db,
-            NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET_PROD }},
-            NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL_PROD }},
-            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID_PROD }},
-            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET_PROD }},
-            MICROSOFT_CLIENT_ID=${{ secrets.MICROSOFT_CLIENT_ID_PROD }},
-            MICROSOFT_CLIENT_SECRET=${{ secrets.MICROSOFT_CLIENT_SECRET_PROD }},
-            MICROSOFT_TENANT_ID=${{ secrets.MICROSOFT_TENANT_ID_PROD }},
-            EMAIL_USER=${{ secrets.EMAIL_USER_PROD }},
-            EMAIL_PASS=${{ secrets.EMAIL_PASS_PROD }},
-            ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL_PROD }},
-            ADMIN_PASS=${{ secrets.ADMIN_PASS_PROD }},
+            DATABASE_URL=postgresql://${{ secrets.DB_USER_PROD }}:${{ secrets.DB_PASS_PROD }}@localhost/bananacode?host=/cloudsql/${{ env.CLOUD_SQL_INSTANCE }}
+            NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET_PROD }}
+            NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL_PROD }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID_PROD }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET_PROD }}
+            MICROSOFT_CLIENT_ID=${{ secrets.MICROSOFT_CLIENT_ID_PROD }}
+            MICROSOFT_CLIENT_SECRET=${{ secrets.MICROSOFT_CLIENT_SECRET_PROD }}
+            MICROSOFT_TENANT_ID=${{ secrets.MICROSOFT_TENANT_ID_PROD }}
+            EMAIL_USER=${{ secrets.EMAIL_USER_PROD }}
+            EMAIL_PASS=${{ secrets.EMAIL_PASS_PROD }}
+            ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL_PROD }}
+            ADMIN_PASS=${{ secrets.ADMIN_PASS_PROD }}
             ADMIN_NAME=${{ secrets.ADMIN_NAME_PROD }}
