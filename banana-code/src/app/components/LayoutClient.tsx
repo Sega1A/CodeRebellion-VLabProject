@@ -1,6 +1,5 @@
 "use client";
 import { usePathname } from "next/navigation";
-import { SessionProvider } from "next-auth/react";
 import Navbar from "./navbar/page";
 import HydrationErrorSuppressor from "./HydrationErrorSuppressor";
 
@@ -16,10 +15,10 @@ export default function LayoutClient({
   );
 
   return (
-    <SessionProvider>
+    <>
       <HydrationErrorSuppressor />
       {showNavbar && <Navbar />}
       <main>{children}</main>
-    </SessionProvider>
+    </>
   );
 }

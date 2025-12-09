@@ -1,4 +1,5 @@
 import LayoutClient from "./components/LayoutClient";
+import Providers from "./components/Providers";
 import "./globals.css";
 
 export default function RootLayout({
@@ -10,7 +11,9 @@ export default function RootLayout({
     <html lang="en" suppressHydrationWarning>
       <body suppressHydrationWarning>
         <div suppressHydrationWarning>
-          <LayoutClient>{children}</LayoutClient>
+          <Providers>
+            <LayoutClient>{children}</LayoutClient>
+          </Providers>
         </div>
       </body>
     </html>
