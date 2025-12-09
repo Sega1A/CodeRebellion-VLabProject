@@ -20,6 +20,8 @@ export const AuthService = {
       image: null,
       createdAt: new Date(),
       updatedAt: new Date(),
+      studentCode: null,
+      phone: null,
     };
 
     return UserRepository.create(newUserData);
