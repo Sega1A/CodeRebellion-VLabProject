@@ -1,11 +1,20 @@
 import { UserService } from "@/services/user.service";
 import { UserRepository } from "@/repositories/user.repository";
+import { Role } from "@prisma/client";
 
-type Role =
-  | "ADMINISTRADOR"
-  | "ESTUDIANTE"
-  | "PROFESOR_EJECUTOR"
-  | "PROFESOR_EDITOR";
+type MockUser = {
+  id: string;
+  name: string | null;
+  email: string | null;
+  password: string | null;
+  emailVerified: Date | null;
+  image: string | null;
+  role: Role;
+  createdAt: Date;
+  updatedAt: Date;
+  studentCode: string | null;
+  phone: string | null;
+};
 
 jest.mock("@/repositories/user.repository");
 
@@ -60,7 +69,9 @@ describe("UserService", () => {
       role: "ADMINISTRADOR",
       createdAt: new Date(),
       updatedAt: new Date(),
-    });
+      studentCode: null,
+      phone: null,
+    } as MockUser);
 
     await expect(
       UserService.changeUserRole("1", "PROFESOR_EJECUTOR")
@@ -68,17 +79,7 @@ describe("UserService", () => {
   });
 
   test("changeUserRole cambia el rol correctamente", async () => {
-    const user: {
-      id: string;
-      name: string | null;
-      email: string | null;
-      password: string | null;
-      emailVerified: Date | null;
-      image: string | null;
-      role: Role;
-      createdAt: Date;
-      updatedAt: Date;
-    } = {
+    const user: MockUser = {
       id: "2",
       name: null,
       email: "user@test.com",
@@ -88,8 +89,10 @@ describe("UserService", () => {
       role: "ESTUDIANTE",
       createdAt: new Date(),
       updatedAt: new Date(),
+      studentCode: null,
+      phone: null,
     };
-    const updatedUser: typeof user = { ...user, role: "PROFESOR_EJECUTOR" };
+    const updatedUser: MockUser = { ...user, role: "PROFESOR_EJECUTOR" };
 
     mockFindById.mockResolvedValueOnce(user);
     mockChangeRole.mockResolvedValueOnce(updatedUser);

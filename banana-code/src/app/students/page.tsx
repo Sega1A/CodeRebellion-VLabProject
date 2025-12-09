@@ -1,13 +1,10 @@
-"use client";
+import { Suspense } from "react";
+import StudentsContent from "./components/StudentsContent";
 
-import StudentsList from "@/app/components/students-list";
-import { useSearchParams } from "next/navigation";
-
-export default function StudentsListPage() {
-	const searchParams = useSearchParams();
-
-	// Obtener el courseId de los query params, o usar un valor por defecto
-	const courseId = searchParams.get("courseId") || "default-course-id";
-
-	return <StudentsList courseId={courseId} />;
+export default function StudentsPage() {
+  return (
+    <Suspense fallback={<div>Cargando la interfaz de estudiantes...</div>}>
+      <StudentsContent />
+    </Suspense>
+  );
 }

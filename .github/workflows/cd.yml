@@ -1,0 +1,59 @@
+name: Continuous Deployment (CD)
+
+on:
+  push:
+    branches: ["main", "deploy-test"]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    env:
+      SERVICE_NAME: banana-code-service
+      REGION: us-central1
+      CLOUD_SQL_INSTANCE: clever-oasis-479222-s1:us-central1:deploy-db
+    permissions:
+      contents: "read"
+      id-token: "write"
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - id: "auth"
+        uses: "google-github-actions/auth@v2"
+        with:
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
+      - name: Configure Docker
+        run: gcloud auth configure-docker --quiet gcr.io
+      - name: Build Docker Image
+        run: |
+          IMAGE_TAG=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          docker build \
+            -t ${IMAGE_TAG} \
+            -f banana-code/Dockerfile \
+            .
+      - name: Push Docker Image
+        run: |
+          IMAGE_TAG=gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          docker push ${IMAGE_TAG}
+      - name: Deploy to Cloud Run
+        uses: google-github-actions/deploy-cloudrun@v2
+        with:
+          service: ${{ env.SERVICE_NAME }}
+          region: ${{ env.REGION }}
+          image: gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ env.SERVICE_NAME }}:${{ github.sha }}
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          flags: "--add-cloudsql-instances=${{ env.CLOUD_SQL_INSTANCE }} --allow-unauthenticated --quiet"
+          env_vars: |
+            DATABASE_URL=postgresql://${{ secrets.DB_USER_PROD }}:${{ secrets.DB_PASS_PROD }}@localhost/bananacode?host=/cloudsql/${{ env.CLOUD_SQL_INSTANCE }}
+            NEXTAUTH_SECRET=${{ secrets.NEXTAUTH_SECRET_PROD }}
+            NEXTAUTH_URL=${{ secrets.NEXTAUTH_URL_PROD }}
+            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID_PROD }}
+            GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET_PROD }}
+            MICROSOFT_CLIENT_ID=${{ secrets.MICROSOFT_CLIENT_ID_PROD }}
+            MICROSOFT_CLIENT_SECRET=${{ secrets.MICROSOFT_CLIENT_SECRET_PROD }}
+            MICROSOFT_TENANT_ID=${{ secrets.MICROSOFT_TENANT_ID_PROD }}
+            EMAIL_USER=${{ secrets.EMAIL_USER_PROD }}
+            EMAIL_PASS=${{ secrets.EMAIL_PASS_PROD }}
+            ADMIN_EMAIL=${{ secrets.ADMIN_EMAIL_PROD }}
+            ADMIN_PASS=${{ secrets.ADMIN_PASS_PROD }}
+            ADMIN_NAME=${{ secrets.ADMIN_NAME_PROD }}
